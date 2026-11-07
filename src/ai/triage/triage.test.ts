@@ -161,9 +161,16 @@ describe("runTriage", () => {
   });
 
   it("caps an answer too long to send in full at partial (R3)", async () => {
+    // Neutral facts, so only the truncation rule can lower this result.
     const complete = JSON.stringify({
       ...JSON.parse(VALID),
       completeness: "complete",
+      facts: {
+        expiryDate: null,
+        expiryQuote: null,
+        coverageAmount: null,
+        holderName: null,
+      },
       flags: [],
     });
     const outcome = await runTriage(
@@ -174,6 +181,9 @@ describe("runTriage", () => {
     );
     expect(outcome.inputTruncated).toBe(true);
     expect(outcome.ok && outcome.result.completeness).toBe("partial");
+    expect(outcome.ok && outcome.result.ruleNotes.join(" ")).toMatch(
+      /too long to read in full/,
+    );
   });
 
   it("turns a mistyped AI_MODEL into a failed run with a clear reason", async () => {
