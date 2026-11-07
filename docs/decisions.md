@@ -16,6 +16,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 - **2026-11-07 · Default model: Claude Sonnet 5 (`anthropic:claude-sonnet-5`).**
   Why: in the eval (`docs/eval/2026-11-07-report.md`), Sonnet 5 and Haiku 4.5 both passed all 16 runs, and 8 cases can't separate them. Sonnet 5 is the stronger model for messier real answers, at about $0.006 per triage and 3.1 s.
   Rejected: Opus 5 (14 of 16, stricter than the request on one case, about $0.017 per triage and 5.5 s). Haiku 4.5 stays a cheaper option through `AI_MODEL`.
+  Re-run on prompt `triage-v2` (`docs/eval/2026-11-07-triage-v2-report.md`): all three passed 16 of 16. Sonnet 5 stays the default. Opus 5 costs about three times as much per triage for the same result.
 
 - **2026-11-07 · The subcontractor's answer goes alone in the user message. Our rules and the request go in the system instructions.**
   Why: research (`docs/research/ai-triage.md`) shows role separation lowers injection success, but only partly. So it's one layer. Rules in code and the reviewer's decision are the others.

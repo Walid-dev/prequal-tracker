@@ -47,7 +47,7 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 - **Package tags were checked.** `npm install prisma` resolves to an 8.0 release candidate where SQLite is experimental. That finding led to Drizzle.
 - **Outside claims were source-checked.** Two claims from AI reviews, a company founding year and a "standard" insurance limit, had no source behind them and were left out.
 - **A second model reviewed the whole repo.** Codex (GPT Sol 6.1) worked from a written brief and reproduced each finding before reporting it. It reviewed the whole repo, then re-checked each round of fixes. All ten findings were fixed. Each code fix has a test that fails without it. The two command fixes (seed and README) were checked by hand.
-- **The model was chosen by measurement.** The eval ran 8 labelled cases twice on three models, with the labels committed first. Sonnet 5 and Haiku 4.5 passed every case. Opus 5 was stricter than the request on one case. Sonnet 5 became the default.
+- **The model was chosen by measurement.** The eval ran 8 labelled cases twice on three models, with the labels committed first. Sonnet 5 and Haiku 4.5 passed every case. Opus 5 was stricter than the request on one case. Sonnet 5 became the default. After the review fixes, a re-run on prompt `triage-v2` passed every case on all three models.
 - **Browser checks backed up the unit tests.** A real browser drove every form. It caught a dropdown that lost its value after a validation error, which was fixed in the same step.
 
 ## Plan changes during the build

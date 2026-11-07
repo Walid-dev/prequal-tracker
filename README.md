@@ -95,11 +95,11 @@ Eight labelled cases cover a complete answer, low coverage, an expired clearance
 
 | Model | Passed | Mean time | Cost per triage |
 | --- | --- | --- | --- |
-| Claude Haiku 4.5 | 16 of 16 | 2.4 s | about $0.002 |
-| **Claude Sonnet 5 (default)** | 16 of 16 | 3.1 s | about $0.006 |
-| Claude Opus 5 | 14 of 16 | 5.5 s | about $0.017 |
+| Claude Haiku 4.5 | 16 of 16 | 3.5 s | about $0.002 |
+| **Claude Sonnet 5 (default)** | 16 of 16 | 3.6 s | about $0.006 |
+| Claude Opus 5 | 16 of 16 | 5.6 s | about $0.017 |
 
-Each case ran twice per model, on prompt `triage-v1`. No model rated an answer more leniently than its label. Opus 5 was stricter than the request on one case. Full report: [docs/eval/2026-11-07-report.md](docs/eval/2026-11-07-report.md).
+Each case ran twice per model, on prompt `triage-v2`. No model rated an answer more leniently than its label, and no rule had to change a live result. Full report: [docs/eval/2026-11-07-triage-v2-report.md](docs/eval/2026-11-07-triage-v2-report.md). The first run, on `triage-v1`, is in [docs/eval/2026-11-07-report.md](docs/eval/2026-11-07-report.md).
 
 ```bash
 npm run eval        # mock mode: free, runs in CI, fails if the pipeline or the rules break

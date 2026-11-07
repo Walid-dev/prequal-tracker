@@ -692,7 +692,7 @@
             <p class="files">Files: docs/review/brief.md · docs/review/findings.md · one fix commit per accepted finding</p>
             <p class="chk">Check: every finding is either fixed in a commit that names it or answered in <code>findings.md</code>, and lint, typecheck, tests, and the mock eval still pass after the fixes.</p>
             <p class="commit">docs(review): add the review brief and findings, then fix(...) per finding</p>
-            <p class="chk"><strong>☑ Done.</strong> Ten findings (1 high, 6 medium, 3 low), all reproduced and fixed. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 51 tests and the mock eval pass.</p>
+            <p class="chk"><strong>☑ Done.</strong> Ten findings (1 high, 6 medium, 3 low), all reproduced and fixed. After the fixes, the live eval re-ran on prompt <code>triage-v2</code>: all three models passed 16 of 16, for $0.41. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 51 tests and the mock eval pass.</p>
           </div>
         </li>
         <li class="gate">
