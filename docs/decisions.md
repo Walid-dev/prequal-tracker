@@ -4,6 +4,9 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
+- **2026-11-07 · The design and the execution plan are HTML pages, in the same format as our kickoff docs.**
+  Why: diagrams whose boxes open the code, links pinned to a commit, and hover cards explain the system faster than prose. Markdown stays for the README, decisions, and process notes, which GitHub renders.
+
 - **2026-11-07 · Default model: Claude Sonnet 5.**
   Why: in the eval (`docs/eval/2026-11-07-report.md`), Sonnet 5 and Haiku 4.5 both passed all 16 runs, and 8 cases can't separate them. Sonnet 5 is the stronger model for messier real answers, at about $0.006 per triage and 3.1 s.
   Rejected: Opus 5 (14 of 16, stricter than the request on one case, about $0.017 per triage and 5.5 s). Haiku 4.5 stays a cheaper option through `AI_MODEL`.
@@ -21,7 +24,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
   Why: the demo seed, the mock model, and the eval all need the same subcontractor answers. One file (`src/samples/answers.ts`) avoids three copies that drift apart. It holds inputs only. The expected results live with the eval, so they can be committed before the first live run.
 
 - **2026-11-07 · Independent review by a second AI model before sharing.**
-  Why: the model that wrote the code shouldn't be the only one that reviews it. A different model (Codex) reviews the finished repo, and each finding is fixed in its own commit or answered in writing.
+  Why: the model that wrote the code shouldn't be the only one that reviews it. A different model (Codex, GPT Sol 6.1 with extra high reasoning) reviews the finished repo against `docs/review/brief.md`. Each finding is fixed in its own commit or answered in writing.
 
 - **2026-11-07 · Build budget of 3 hours of active time, hard stop at 3.5 hours, stated in the README.**
   Why: the assignment tests scoping ("pick a small slice and do it well"). A working, tested slice answers that better than a polished product. The work can pause between gates. Only active time counts, and the README states the total.
@@ -51,7 +54,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 - **2026-11-07 · Text responses only.**
   Why: text proves the triage logic. Uploads add storage, scanning, and size limits.
-  Next step: PDF uploads. Claude can read PDFs directly.
+  Next step: PDF uploads. Current models can read PDFs directly.
 
 - **2026-11-07 · No login. The reviewer types a name.**
   Next step: SSO, with reviewer and subcontractor roles.
