@@ -1,5 +1,11 @@
 # Review findings
 
+## Confirmation, 2026-11-07 · `af0c782`
+
+**R10 is resolved. All recorded findings are now closed.** Verified fix `f2bbacd`: the original `Octopus` and `Marching` reproductions, plus the day-first variant, now clear the date, cap completeness at partial, and ask for confirmation through both the rules and structured mock calls. All 77 controls for valid month names, abbreviations, case variants, and numeric dates passed. No additional findings in the reviewed fix.
+
+**Checks:** lint, typecheck, **51 tests**, and the mock eval (**8/8**, **$0.0000**) passed. No paid calls. Recommendation: approve within the reviewed scope. Review confidence: **95%**; ship confidence: **90%**.
+
 ## Confirmation, 2026-11-07 · `9f9956d`
 
 **R4, R6, R8, and R9 are resolved for their original reproductions.** One additional medium finding in the added date parser remains (R10 below). Recommendation: request changes. Review confidence: **95%**; ship confidence: **80%**. The original failures no longer reproduce, and the requested checks pass; the parser still accepts an invalid month token as evidence for a valid date.
