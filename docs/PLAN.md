@@ -30,6 +30,8 @@ AI triage helps with the reading. It checks one answer against the request it an
 
 ## Acceptance criteria
 
+Status: all met. Tests, the mock eval, and the Docker checks cover them. Criterion 17 proves itself on the first push to GitHub.
+
 1. A reviewer can create a case with a company name, a trade, a contact email, and an owner.
 2. The app creates the checklist for the trade. An electrical case gets 4 requests. Other trades get 3.
 3. A response moves a request from `Open` or `Changes requested` to `Responded`.
