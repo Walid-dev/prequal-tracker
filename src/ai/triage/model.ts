@@ -4,7 +4,8 @@ import type { LanguageModel } from "ai";
 
 export type AiMode = "mock" | "live";
 
-export const DEFAULT_MODEL = "claude-opus-5";
+// Chosen from the eval (docs/eval/2026-11-07-report.md): every case passed, at about $0.006 per triage.
+export const DEFAULT_MODEL = "claude-sonnet-5";
 
 // Dollars per million tokens. From Anthropic's published model pricing. Update when prices change.
 const PRICES: Record<string, { input: number; output: number }> = {

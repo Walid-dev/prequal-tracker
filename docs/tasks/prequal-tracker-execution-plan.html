@@ -282,14 +282,14 @@
     <header class="doc-head">
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
-      <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. Design and decisions live in the <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer">kickoff page</a>.</p>
-      <p class="small muted">Status: gate 3 committed and merged into <code>main</code>. Gate 4, proof and docs, is next. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
+      <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. The spec lives in <code>docs/PLAN.md</code>, and the decisions in <code>docs/decisions.md</code>.</p>
+      <p class="small muted">Status: gate 4 committed and merged into <code>main</code>. Gate 5, the independent review, is next.</p>
       <ul class="chips">
-        <li class="chip">Now: <b>step 9</b></li>
-        <li class="chip">Commits: <b>8 of 12</b></li>
-        <li class="chip">Gates: <b>3 of 5</b></li>
+        <li class="chip">Now: <b>step 13</b></li>
+        <li class="chip">Commits: <b>12 of 12</b></li>
+        <li class="chip">Gates: <b>4 of 5</b></li>
         <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
-        <li class="chip">Active time: <b>about 1 h</b></li>
+        <li class="chip">Build time: <b>about 1 h 45</b></li>
       </ul>
     </header>
 
@@ -321,12 +321,10 @@
             <text x="106" y="88" text-anchor="middle" class="t-note">request tracker + AI</text>
             <path d="M196,60 H232" class="wire" marker-end="url(#m1)"/>
 
-            <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer" aria-label="Kickoff v3: decisions locked">
-              <rect x="236" y="20" width="200" height="80" rx="12" class="box c-green"/>
-              <text x="336" y="50" text-anchor="middle" class="t-title">Kickoff v3</text>
-              <text x="336" y="70" text-anchor="middle" class="t-sub">design, decisions locked</text>
-              <text x="336" y="89" text-anchor="middle" class="t-link">kickoff page</text>
-            </a>
+            <rect x="236" y="20" width="200" height="80" rx="12" class="box c-green"/>
+            <text x="336" y="50" text-anchor="middle" class="t-title">Plan v3</text>
+            <text x="336" y="70" text-anchor="middle" class="t-sub">decisions locked</text>
+            <text x="336" y="89" text-anchor="middle" class="t-note">docs/PLAN.md</text>
             <path d="M436,60 H472" class="wire" marker-end="url(#m1)"/>
 
             <a href="#steps" aria-label="This plan: the steps">
@@ -404,22 +402,22 @@
             <text x="618" y="196" class="t-sub">feat/proof · 45 min</text>
             <a href="#step-9" aria-label="Step 9 eval cases">
               <rect x="612" y="208" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="625" cy="217.5" r="4.5" class="dot-ready"/>
+              <circle cx="625" cy="217.5" r="4.5" class="dot-done"/>
               <text x="636" y="222" class="t-link">Step 9<tspan class="t-cname"> eval cases</tspan></text>
             </a>
             <a href="#step-10" aria-label="Step 10 live eval">
               <rect x="612" y="227" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="625" cy="236.5" r="4.5" class="dot-ready"/>
+              <circle cx="625" cy="236.5" r="4.5" class="dot-done"/>
               <text x="636" y="241" class="t-link">Step 10<tspan class="t-cname"> live eval</tspan></text>
             </a>
             <a href="#step-11" aria-label="Step 11 CI">
               <rect x="612" y="246" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="625" cy="255.5" r="4.5" class="dot-ready"/>
+              <circle cx="625" cy="255.5" r="4.5" class="dot-done"/>
               <text x="636" y="260" class="t-link">Step 11<tspan class="t-cname"> CI</tspan></text>
             </a>
             <a href="#step-12" aria-label="Step 12 README">
               <rect x="612" y="265" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="625" cy="274.5" r="4.5" class="dot-ready"/>
+              <circle cx="625" cy="274.5" r="4.5" class="dot-done"/>
               <text x="636" y="279" class="t-link">Step 12<tspan class="t-cname"> README</tspan></text>
             </a>
             <path d="M780,178 H796" class="wire" marker-end="url(#m1)"/>
@@ -433,7 +431,7 @@
             </a>
           </svg>
         </div>
-        <figcaption>Each step line opens its step card below, and the kickoff box opens the design page. The gates run left to right. A gate starts only after you say GO on the one before it. Gate 5 is a review of the whole repo by a different model.</figcaption>
+        <figcaption>Each step line opens its step card below. The gates run left to right. A gate starts only after you say GO on the one before it. Gate 5 is a review of the whole repo by a different model.</figcaption>
       </figure>
       <ul class="legend">
         <li><span class="sw st-ready"></span>Not started</li>
@@ -625,7 +623,7 @@
         </li>
 
         <li class="phase" id="gate-4">Gate 4 · Proof and docs · feat/proof · 45 min · hard stop at 3 h 30</li>
-        <li id="step-9" class="now">
+        <li id="step-9" class="done">
           <span class="num">9</span>
           <div>
             <div class="t">Eval cases and runner</div>
@@ -634,21 +632,23 @@
             <p class="files">Files: evals/cases.json · evals/run.ts · evals/score.ts · evals/score.test.ts · package.json scripts</p>
             <p class="chk">Check: <code>npm run eval</code> in mock mode scores 8 of 8 and exits 0, and changing one expected label makes it exit 1.</p>
             <p class="commit">test(eval): add labeled triage cases and the eval runner</p>
+            <p class="chk"><strong>☑ Done.</strong> Labels reviewed and committed before any live run. The mock eval scores 8 of 8, and a wrong label makes it exit 1.</p>
           </div>
         </li>
-        <li id="step-10">
+        <li id="step-10" class="done">
           <span class="num">10</span>
           <div>
             <div class="t">Live eval report</div>
             <div class="who">I run, after your OK on the quote</div>
             <p>One paid run: 8 cases, 2 runs each, on Haiku 4.5, Sonnet 5, and Opus 5. That's 48 calls, about $0.60 at today's prices. I quote the exact figure first, and you pick the default model from the table.</p>
-            <p class="files">Files: docs/eval/2026-11-07-report.md · .env.example (default model)</p>
+            <p class="files">Files: docs/eval/2026-11-07-report.md · .env.example · src/ai/triage/model.ts · docs/decisions.md</p>
             <p class="chk">Check: the report has a row per case for every model, plus totals for tokens and cost, and the real spend stays under 3 times the quote.</p>
             <p class="commit">docs(eval): add the first live eval report</p>
+            <p class="chk"><strong>☑ Done.</strong> Haiku 4.5 and Sonnet 5 passed 16 of 16. Opus 5 passed 14 of 16, stricter than the request on one case. Spend was $0.39, under the $0.46 quote. Sonnet 5 is now the default model.</p>
             <p class="ref">Prices: <a href="https://docs.anthropic.com/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">Claude pricing</a></p>
           </div>
         </li>
-        <li id="step-11">
+        <li id="step-11" class="done">
           <span class="num">11</span>
           <div>
             <div class="t">CI</div>
@@ -657,10 +657,11 @@
             <p class="files">Files: .github/workflows/ci.yml</p>
             <p class="chk">Check: the same commands pass in a clean clone in my scratch folder, starting from <code>npm ci</code>.</p>
             <p class="commit">chore(ci): run lint, typecheck, tests, and the mock eval on every push</p>
+            <p class="chk"><strong>☑ Done.</strong> All seven CI commands pass in a clean copy of the committed tree, from <code>npm ci</code> to the build.</p>
             <p class="ref">Docs: <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer">GitHub Actions</a></p>
           </div>
         </li>
-        <li id="step-12">
+        <li id="step-12" class="done">
           <span class="num">12</span>
           <div>
             <div class="t">README and process notes</div>
@@ -669,6 +670,7 @@
             <p class="files">Files: README.md · docs/process.md · docs/PLAN.md · docs/tasks/prequal-tracker-execution-plan.html</p>
             <p class="chk">Check: following the README from a clean clone with only Docker works, and the leak search (work names, local paths, work email, key prefixes) comes back empty.</p>
             <p class="commit">docs(readme): write the readme, demo script, and process notes</p>
+            <p class="chk"><strong>☑ Done.</strong> The README covers time spent, running it, a demo, the AI design, the eval, cuts and next steps, the path to production, and legacy systems.</p>
           </div>
         </li>
         <li class="gate">
@@ -676,12 +678,12 @@
           <div>
             <div class="t">GO 4: you read four diffs and the README</div>
             <div class="who">you</div>
-            <p>On GO, I commit, merge <code>feat/proof</code> into <code>main</code>, and close the build time log.</p>
+            <p>On GO, I commit, merge <code>feat/proof</code> into <code>main</code>, and close the build time log.</p> <strong>☑ GO given.</strong>
           </div>
         </li>
 
         <li class="phase" id="gate-5">Gate 5 · Independent review · after gate 4 · logged separately</li>
-        <li id="step-13">
+        <li id="step-13" class="now">
           <span class="num">13</span>
           <div>
             <div class="t">Review by a second model</div>
@@ -731,16 +733,17 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+        <li><span class="when">Gate 4</span><span>Eval (8 of 8 in mock mode, three models live), CI, README, and process notes committed and merged into <code>main</code>.</span></li>
         <li><span class="when">Gate 3</span><span>AI module committed and merged into <code>main</code>: the triage module with its research-backed guards, and the triage panel. 34 tests and 10 browser checks pass.</span></li>
         <li><span class="when">Research</span><span>A verified multi-agent research pass on AI triage confirmed the one-call design and changed five details before gate 3.</span></li>
         <li><span class="when">Gate 2</span><span>Core app committed and merged into <code>main</code>: app setup, database, Docker, cases, responses, and reviews. 17 tests and 9 browser checks pass.</span></li>
       </ol>
-      <p>Next action: gate 4 on <code>feat/proof</code>. First the eval cases and their expected answers, for your review.</p>
+      <p>Next action: gate 5, the review brief for the second model.</p>
     </section>
   </main>
 </div>
 <!-- hovercard:start -->
-<script type="application/json" id="link-tips">{"https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX":{"t":"Kickoff v3 · Prequal Tracker","s":"Decisions locked 2026-11-07","d":"The design page this plan builds from: the domain, the AI design, what was cut, the time decision, and a glossary of every tool in the stack."},"https://www.conventionalcommits.org/en/v1.0.0/":{"t":"Conventional Commits 1.0.0","s":"","d":"The commit message format used for every commit here: type(scope): summary, for example feat(triage): add the triage module."},"https://nextjs.org/docs/app/api-reference/cli/create-next-app":{"t":"create-next-app","s":"Next.js docs","d":"The official generator for a new Next.js app. Step 2 runs it with TypeScript, Tailwind, the App Router, a src folder, and Biome."},"https://nextjs.org/docs/app/guides/upgrading/version-16":{"t":"Upgrading to Next.js 16","s":"Next.js docs","d":"What changed in version 16, such as async params, Turbopack by default, and middleware renamed to proxy. The agent rules in CLAUDE.md follow it."},"https://biomejs.dev/guides/getting-started/":{"t":"Biome","s":"","d":"One tool that formats the code and flags likely mistakes. It runs as npm run lint, locally and in CI."},"https://vitest.dev/guide/":{"t":"Vitest","s":"","d":"The test runner for our unit tests and the end-to-end flow test. It runs as npm test."},"https://orm.drizzle.team/docs/get-started-sqlite":{"t":"Drizzle with SQLite","s":"Drizzle docs","d":"How Drizzle connects to a SQLite file through better-sqlite3. Our five tables are defined this way in one schema file."},"https://orm.drizzle.team/docs/migrations":{"t":"Drizzle migrations","s":"Drizzle docs","d":"How schema changes become numbered SQL files in git, applied in order. This is the database versioning part of the build."},"https://nextjs.org/docs/app/guides/instrumentation":{"t":"Next.js instrumentation","s":"Next.js docs","d":"A hook that runs once when the server starts. We use it to apply database migrations before the first request."},"https://nextjs.org/docs/app/api-reference/config/next-config-js/output":{"t":"Standalone output","s":"Next.js docs","d":"A build mode that bundles only the server and the files it uses, which keeps the Docker image small."},"https://docs.docker.com/compose/":{"t":"Docker Compose","s":"Docker docs","d":"Runs the app container from one file, with its port, settings, and the named volume that keeps the database between restarts."},"https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction":{"t":"WSIB clearance in construction","s":"Ontario policy","d":"WSIB policy that requires a hiring contractor in construction to get a clearance certificate for each contractor it hires directly. It is the first item on every checklist."},"https://www.ihsa.ca/COR/COR-FAQs.aspx":{"t":"COR, Certificate of Recognition","s":"IHSA","d":"IHSA's certification of a company's health and safety program, often required on Ontario construction projects. A checklist item for every trade."},"https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/":{"t":"ESA electrical contractor licence","s":"Electrical Safety Authority","d":"Ontario's licence for electrical contractors, shown as a 7-digit number on contracts. The extra checklist item for electrical subcontractors."},"https://nextjs.org/docs/app/getting-started/mutating-data":{"t":"Server Actions","s":"Next.js docs","d":"Functions that run on the server when a form is submitted. Every write in the app goes through one: create a case, respond, review, run triage."},"https://react.dev/reference/react/useActionState":{"t":"useActionState","s":"React docs","d":"The React hook our forms use to show a pending state and the errors a server action returns."},"https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data":{"t":"AI SDK structured output","s":"AI SDK docs","d":"How generateText with an output schema returns JSON checked against a Zod schema. The triage result comes back this way."},"https://ai-sdk.dev/docs/ai-sdk-core/testing":{"t":"AI SDK testing","s":"AI SDK docs","d":"The SDK's mock language models for tests. Our fixture mock is built on MockLanguageModelV4, so tests and CI never call the real API."},"https://ai-sdk.dev/providers/ai-sdk-providers/anthropic":{"t":"AI SDK Anthropic provider","s":"AI SDK docs","d":"The adapter that connects the AI SDK to Claude models. It reads the API key from ANTHROPIC_API_KEY."},"https://www.anthropic.com/engineering/building-effective-agents":{"t":"Building effective agents","s":"Anthropic engineering","d":"Anthropic's guidance to use simple workflows when the steps are predictable and agents only when they are not. It backs the one-call design."},"https://docs.anthropic.com/en/docs/about-claude/pricing":{"t":"Claude pricing","s":"Anthropic docs","d":"Per-token prices for each Claude model. The eval quote and the cost shown on each triage run use these numbers."},"https://docs.github.com/en/actions":{"t":"GitHub Actions","s":"GitHub docs","d":"GitHub's CI service. Our workflow runs lint, typecheck, tests, the mock eval, and the build on every push."},"https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR":{"t":"Prequal Tracker build plan","s":"Live runbook","d":"This page, published as an artifact. It is republished after every step, so the link always shows the current state of the build."}}</script>
+<script type="application/json" id="link-tips">{"https://www.conventionalcommits.org/en/v1.0.0/":{"t":"Conventional Commits 1.0.0","s":"","d":"The commit message format used for every commit here: type(scope): summary, for example feat(triage): add the triage module."},"https://nextjs.org/docs/app/api-reference/cli/create-next-app":{"t":"create-next-app","s":"Next.js docs","d":"The official generator for a new Next.js app. Step 2 runs it with TypeScript, Tailwind, the App Router, a src folder, and Biome."},"https://nextjs.org/docs/app/guides/upgrading/version-16":{"t":"Upgrading to Next.js 16","s":"Next.js docs","d":"What changed in version 16, such as async params, Turbopack by default, and middleware renamed to proxy. The agent rules in CLAUDE.md follow it."},"https://biomejs.dev/guides/getting-started/":{"t":"Biome","s":"","d":"One tool that formats the code and flags likely mistakes. It runs as npm run lint, locally and in CI."},"https://vitest.dev/guide/":{"t":"Vitest","s":"","d":"The test runner for our unit tests and the end-to-end flow test. It runs as npm test."},"https://orm.drizzle.team/docs/get-started-sqlite":{"t":"Drizzle with SQLite","s":"Drizzle docs","d":"How Drizzle connects to a SQLite file through better-sqlite3. Our five tables are defined this way in one schema file."},"https://orm.drizzle.team/docs/migrations":{"t":"Drizzle migrations","s":"Drizzle docs","d":"How schema changes become numbered SQL files in git, applied in order. This is the database versioning part of the build."},"https://nextjs.org/docs/app/guides/instrumentation":{"t":"Next.js instrumentation","s":"Next.js docs","d":"A hook that runs once when the server starts. We use it to apply database migrations before the first request."},"https://nextjs.org/docs/app/api-reference/config/next-config-js/output":{"t":"Standalone output","s":"Next.js docs","d":"A build mode that bundles only the server and the files it uses, which keeps the Docker image small."},"https://docs.docker.com/compose/":{"t":"Docker Compose","s":"Docker docs","d":"Runs the app container from one file, with its port, settings, and the named volume that keeps the database between restarts."},"https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction":{"t":"WSIB clearance in construction","s":"Ontario policy","d":"WSIB policy that requires a hiring contractor in construction to get a clearance certificate for each contractor it hires directly. It is the first item on every checklist."},"https://www.ihsa.ca/COR/COR-FAQs.aspx":{"t":"COR, Certificate of Recognition","s":"IHSA","d":"IHSA's certification of a company's health and safety program, often required on Ontario construction projects. A checklist item for every trade."},"https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/":{"t":"ESA electrical contractor licence","s":"Electrical Safety Authority","d":"Ontario's licence for electrical contractors, shown as a 7-digit number on contracts. The extra checklist item for electrical subcontractors."},"https://nextjs.org/docs/app/getting-started/mutating-data":{"t":"Server Actions","s":"Next.js docs","d":"Functions that run on the server when a form is submitted. Every write in the app goes through one: create a case, respond, review, run triage."},"https://react.dev/reference/react/useActionState":{"t":"useActionState","s":"React docs","d":"The React hook our forms use to show a pending state and the errors a server action returns."},"https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data":{"t":"AI SDK structured output","s":"AI SDK docs","d":"How generateText with an output schema returns JSON checked against a Zod schema. The triage result comes back this way."},"https://ai-sdk.dev/docs/ai-sdk-core/testing":{"t":"AI SDK testing","s":"AI SDK docs","d":"The SDK's mock language models for tests. Our fixture mock is built on MockLanguageModelV4, so tests and CI never call the real API."},"https://ai-sdk.dev/providers/ai-sdk-providers/anthropic":{"t":"AI SDK Anthropic provider","s":"AI SDK docs","d":"The adapter that connects the AI SDK to Claude models. It reads the API key from ANTHROPIC_API_KEY."},"https://www.anthropic.com/engineering/building-effective-agents":{"t":"Building effective agents","s":"Anthropic engineering","d":"Anthropic's guidance to use simple workflows when the steps are predictable and agents only when they are not. It backs the one-call design."},"https://docs.anthropic.com/en/docs/about-claude/pricing":{"t":"Claude pricing","s":"Anthropic docs","d":"Per-token prices for each Claude model. The eval quote and the cost shown on each triage run use these numbers."},"https://docs.github.com/en/actions":{"t":"GitHub Actions","s":"GitHub docs","d":"GitHub's CI service. Our workflow runs lint, typecheck, tests, the mock eval, and the build on every push."}}</script>
 <div id="hovercard" class="hovercard" role="tooltip" hidden></div>
 <script>
 /* Hover cards: show the description from #link-tips when a link is hovered or focused. */

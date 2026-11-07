@@ -13,7 +13,7 @@ The work can pause between gates and resume later, so this log records active ti
 | Build, gate 1: plan | about 15 min |
 | Build, gate 2: core app | about 30 min |
 | Build, gate 3: AI module | about 15 min |
-| Build, gate 4: proof and docs | |
+| Build, gate 4: proof and docs | about 40 min |
 | Independent review | |
 
 ## How it was planned
@@ -46,6 +46,7 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 - **Library versions were checked, not assumed.** A first draft from another AI model used AI SDK 4 calls (`maxSteps`, `toDataStreamResponse()`) that no longer exist in version 7. Reading the published type files caught it before any code was written. `CLAUDE.md` now lists the current calls.
 - **Package tags were checked.** `npm install prisma` resolves to an 8.0 release candidate where SQLite is experimental. That finding led to Drizzle.
 - **Outside claims were source-checked.** Two claims from AI reviews, a company founding year and a "standard" insurance limit, had no source behind them and were left out.
+- **The model was chosen by measurement.** The eval ran 8 labelled cases twice on three models, with the labels committed first. Sonnet 5 and Haiku 4.5 passed every case. Opus 5 was stricter than the request on one case. Sonnet 5 became the default.
 - **Browser checks backed up the unit tests.** A real browser drove every form. It caught a dropdown that lost its value after a validation error, which was fixed in the same step.
 
 ## Plan changes during the build
@@ -55,6 +56,9 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 - **Step 8:** the plan said "Request changes" would open with the AI's questions filled in. The note box is shared with Accept, so a pre-filled note could be saved by mistake. One click now inserts the questions instead.
 - **Step 6:** the eight sample answers live in one file, `src/samples/answers.ts`. The demo seed uses them now; the mock model (step 7) and the eval (step 9) will reuse the same texts.
 
-## Transcript excerpts
+## Steering, in practice
 
-Added at the end of the build.
+- **Review before running.** The first draft plan from another AI model was reviewed, not executed. The review found outdated SDK calls and a missing evaluation, and the plan was rebuilt.
+- **Research before the AI module.** Building waited for a verified research pass on structured output, prompt injection, and grounding. Five design details changed as a result.
+- **Gates, not autopilot.** Each gate ended with diffs and commit messages for review, and nothing was committed without a go-ahead. Paid model calls came with a cost quote first.
+- **Rules in writing.** `CLAUDE.md` kept the agent on current APIs, clear module boundaries, plain-language comments, and safe commands. Each new lesson became a rule there.
