@@ -31,7 +31,7 @@ The work can pause between gates and resume later, so this log records active ti
 - `CLAUDE.md` holds the project rules: pinned versions, current API notes, architecture boundaries, code style, and Docker safety.
 - The build runs in 4 gates. At each gate I read the diffs and the commit messages before anything is committed.
 - Paid model calls need my OK and a cost quote first.
-- A second AI model reviews the finished repo before it's shared.
+- A second AI model (Codex, GPT Sol 6.1) reviews the finished repo before it's shared, against a written brief (`docs/review/brief.md`).
 
 ## How the work is verified
 
