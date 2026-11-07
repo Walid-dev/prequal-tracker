@@ -15,6 +15,8 @@ services:
         required: false
     environment:
       DATABASE_PATH: /data/app.db
+      # Adds the two demo cases on first start, only while the database has no cases.
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
     volumes:
       - data:/data
     healthcheck:

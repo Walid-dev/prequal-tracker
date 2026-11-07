@@ -283,13 +283,13 @@
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
       <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. Design and decisions live in the <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer">kickoff page</a>.</p>
-      <p class="small muted">Status: gate 1 approved and committed. Step 2 of 12 in progress on <code>feat/core</code>. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
+      <p class="small muted">Status: gate 2 committed and merged into <code>main</code>. Gate 3, the AI module, is next. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
       <ul class="chips">
-        <li class="chip">Now: <b>step 2</b></li>
-        <li class="chip">Commits: <b>1 of 12</b></li>
-        <li class="chip">Gates: <b>1 of 5</b></li>
+        <li class="chip">Now: <b>step 7</b></li>
+        <li class="chip">Commits: <b>6 of 12</b></li>
+        <li class="chip">Gates: <b>2 of 5</b></li>
         <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
-        <li class="chip">Active time: <b>about 15 min</b></li>
+        <li class="chip">Active time: <b>about 45 min</b></li>
       </ul>
     </header>
 
@@ -361,27 +361,27 @@
             <text x="226" y="196" class="t-sub">feat/core · 60 min</text>
             <a href="#step-2" aria-label="Step 2 scaffold">
               <rect x="220" y="208" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="233" cy="217.5" r="4.5" class="dot-prog"/>
+              <circle cx="233" cy="217.5" r="4.5" class="dot-done"/>
               <text x="244" y="222" class="t-link">Step 2<tspan class="t-cname"> scaffold</tspan></text>
             </a>
             <a href="#step-3" aria-label="Step 3 database">
               <rect x="220" y="227" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="233" cy="236.5" r="4.5" class="dot-ready"/>
+              <circle cx="233" cy="236.5" r="4.5" class="dot-done"/>
               <text x="244" y="241" class="t-link">Step 3<tspan class="t-cname"> database</tspan></text>
             </a>
             <a href="#step-4" aria-label="Step 4 Docker">
               <rect x="220" y="246" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="233" cy="255.5" r="4.5" class="dot-ready"/>
+              <circle cx="233" cy="255.5" r="4.5" class="dot-done"/>
               <text x="244" y="260" class="t-link">Step 4<tspan class="t-cname"> Docker</tspan></text>
             </a>
             <a href="#step-5" aria-label="Step 5 cases">
               <rect x="220" y="265" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="233" cy="274.5" r="4.5" class="dot-ready"/>
+              <circle cx="233" cy="274.5" r="4.5" class="dot-done"/>
               <text x="244" y="279" class="t-link">Step 5<tspan class="t-cname"> cases</tspan></text>
             </a>
             <a href="#step-6" aria-label="Step 6 reviews">
               <rect x="220" y="284" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="233" cy="293.5" r="4.5" class="dot-ready"/>
+              <circle cx="233" cy="293.5" r="4.5" class="dot-done"/>
               <text x="244" y="298" class="t-link">Step 6<tspan class="t-cname"> reviews</tspan></text>
             </a>
             <path d="M388,178 H404" class="wire" marker-end="url(#m1)"/>
@@ -515,31 +515,33 @@
         </li>
 
         <li class="phase" id="gate-2">Gate 2 · Core app · feat/core · 60 min</li>
-        <li id="step-2" class="now">
+        <li id="step-2" class="done">
           <span class="num">2</span>
           <div>
             <div class="t">Scaffold the app</div>
             <div class="who">I</div>
             <p>Generate Next.js 16.4.5 in a temporary folder and copy it in, so nothing we wrote is overwritten. Then pin every version exactly and add Vitest and tsx. Classic caching, no Cache Components. No features yet.</p>
-            <p class="files">Files: package.json · package-lock.json · tsconfig.json · next.config.ts · biome.json · vitest.config.mts · src/app/layout.tsx · src/app/page.tsx · src/app/globals.css · src/smoke.test.ts</p>
-            <p class="chk">Check: <code>npm run lint</code>, <code>npm run typecheck</code>, <code>npm test</code>, and <code>npm run build</code> all pass, and <code>npm run dev</code> serves a page on localhost:3000.</p>
+            <p class="files">Files: package.json · package-lock.json · tsconfig.json · next.config.ts · biome.json · vitest.config.mts · src/app/layout.tsx · src/app/page.tsx · src/app/globals.css · CLAUDE.md</p>
+            <p class="chk">Check: <code>npm run lint</code>, <code>npm run typecheck</code>, <code>npm test</code>, and <code>npm run build</code> all pass, and the build renders the home page.</p>
+            <p class="chk"><strong>☑ Done.</strong> Every version pinned exactly. No placeholder test: real tests start in step 3. The page check uses the build output.</p>
             <p class="commit">chore(repo): scaffold next.js app with typescript, tailwind, biome, and vitest</p>
             <p class="ref">Docs: <a href="https://nextjs.org/docs/app/api-reference/cli/create-next-app" target="_blank" rel="noopener noreferrer">create-next-app</a> · <a href="https://nextjs.org/docs/app/guides/upgrading/version-16" target="_blank" rel="noopener noreferrer">Next.js 16 changes</a> · <a href="https://biomejs.dev/guides/getting-started/" target="_blank" rel="noopener noreferrer">Biome</a> · <a href="https://vitest.dev/guide/" target="_blank" rel="noopener noreferrer">Vitest</a></p>
           </div>
         </li>
-        <li id="step-3">
+        <li id="step-3" class="done">
           <span class="num">3</span>
           <div>
             <div class="t">Database: schema, first migration, seed, health check</div>
             <div class="who">I</div>
-            <p>Five tables in one Drizzle schema (cases, requests, responses, triage_runs, reviews), the first SQL migration, migrations applied when the server starts, demo seed data, and a health route. The database opens lazily, so <code>next build</code> never touches it. Still no screens.</p>
-            <p class="files">Files: src/db/schema.ts · src/db/client.ts · src/db/migrate.ts · src/db/seed.ts · src/instrumentation.ts · drizzle.config.ts · drizzle/0000_*.sql · src/app/api/health/route.ts · src/db/db.test.ts</p>
-            <p class="chk">Check: deleting <code>data/app.db</code> and starting the server recreates it, <code>curl localhost:3000/api/health</code> returns <code>{"ok":true}</code>, and running the seed twice still gives one set of demo cases.</p>
+            <p>Five tables in one Drizzle schema (cases, requests, responses, triage_runs, reviews), the first SQL migration, migrations applied when the server starts, and a health route. The demo seed moved to step 6. The database opens lazily, so <code>next build</code> never touches it. Still no screens.</p>
+            <p class="files">Files: src/db/schema.ts · src/db/client.ts · src/db/migrate.ts · src/instrumentation.ts · drizzle.config.ts · drizzle/0000_init.sql · drizzle/meta · src/app/api/health/route.ts · src/db/db.test.ts</p>
+            <p class="chk">Check: tests prove the migrations create the five tables, migrating twice is safe, foreign keys are enforced, and the health route answers <code>{"ok":true}</code>. The build never opens the database.</p>
+            <p class="chk"><strong>☑ Done.</strong> 4 tests pass, <code>drizzle-kit check</code> is clean, and the build created no data folder.</p>
             <p class="commit">feat(db): add schema, first migration, seed, and health check</p>
             <p class="ref">Docs: <a href="https://orm.drizzle.team/docs/get-started-sqlite" target="_blank" rel="noopener noreferrer">Drizzle with SQLite</a> · <a href="https://orm.drizzle.team/docs/migrations" target="_blank" rel="noopener noreferrer">Drizzle migrations</a> · <a href="https://nextjs.org/docs/app/guides/instrumentation" target="_blank" rel="noopener noreferrer">instrumentation</a></p>
           </div>
         </li>
-        <li id="step-4">
+        <li id="step-4" class="done">
           <span class="num">4</span>
           <div>
             <div class="t">Docker, early</div>
@@ -548,10 +550,11 @@
             <p class="files">Files: Dockerfile · .dockerignore · compose.yaml</p>
             <p class="chk">Check: <code>docker compose up --build -d</code>, then the health route answers ok. After <code>docker compose down</code> and <code>up</code> again, the seeded cases are still there. No <code>.env</code> file is inside the image.</p>
             <p class="commit">chore(docker): add image and compose with a persistent volume</p>
+            <p class="chk"><strong>☑ Done.</strong> Done in about 3 minutes of the 20-minute timebox. The container is healthy, runs as <code>node</code>, has no <code>.env</code> file inside, and a row written before <code>down</code> and <code>up</code> was still there after.</p>
             <p class="ref">Docs: <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/output" target="_blank" rel="noopener noreferrer">standalone output</a> · <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose</a></p>
           </div>
         </li>
-        <li id="step-5">
+        <li id="step-5" class="done">
           <span class="num">5</span>
           <div>
             <div class="t">Cases and checklists</div>
@@ -560,18 +563,20 @@
             <p class="files">Files: src/domain/checklists.ts · src/domain/cases.ts · their tests · src/app/cases/page.tsx · src/app/cases/new/page.tsx · src/app/cases/new/case-form.tsx · src/app/cases/actions.ts · src/app/cases/[id]/page.tsx · src/components/status-pill.tsx</p>
             <p class="chk">Check: an electrical case gets 4 requests including the ESA licence, a plumbing case gets 3, and the form shows an error next to a bad email instead of saving it.</p>
             <p class="commit">feat(cases): create subcontractor cases with a checklist per trade</p>
+            <p class="chk"><strong>☑ Done.</strong> 6 new tests pass. Every page renders on each request, so the case list is never stale.</p>
             <p class="ref">Domain: <a href="https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction" target="_blank" rel="noopener noreferrer">WSIB clearance</a> · <a href="https://www.ihsa.ca/COR/COR-FAQs.aspx" target="_blank" rel="noopener noreferrer">COR</a> · <a href="https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/" target="_blank" rel="noopener noreferrer">ESA licence</a></p>
           </div>
         </li>
-        <li id="step-6">
+        <li id="step-6" class="done">
           <span class="num">6</span>
           <div>
             <div class="t">Responses and reviews</div>
             <div class="who">I</div>
             <p>The tracker loop. The subcontractor answers (a form clearly labeled as the demo stand-in for their side). The reviewer accepts or requests changes, with a name and a note. Every event lands on a timeline. Accept is refused without a response, in the service and in the UI.</p>
-            <p class="files">Files: src/domain/requests.ts · src/domain/requests.test.ts · src/domain/flow.test.ts · src/app/requests/[id]/page.tsx · src/app/requests/[id]/response-form.tsx · src/app/requests/[id]/review-form.tsx · src/app/requests/actions.ts</p>
+            <p class="files">Files: src/domain/requests.ts · src/domain/requests.test.ts · src/domain/flow.test.ts · src/domain/seed.ts · src/samples/answers.ts · scripts/seed.ts · src/instrumentation.ts · src/app/requests/[id]/page.tsx · response-form.tsx · review-form.tsx · src/app/requests/actions.ts · compose.yaml · .env.example · docs</p>
             <p class="chk">Check: a test proves that accepting without a response throws, the flow test moves progress from 0 of 3 to 1 of 3, and a request sent back returns to Responded after a new answer.</p>
             <p class="commit">feat(requests): respond, accept, and request changes with an audit timeline</p>
+            <p class="chk"><strong>☑ Done.</strong> 17 tests pass. A headless browser drove the real forms through 9 checks: a bad email is refused, typed values are kept, a new mechanical case gets 3 requests, accept is hidden before an answer, answer then accept works, and the case list shows 1 of 3. It found one bug the unit tests missed: the trade dropdown reset after a form error. Fixed in this step.</p>
             <p class="ref">Docs: <a href="https://nextjs.org/docs/app/getting-started/mutating-data" target="_blank" rel="noopener noreferrer">Server Actions</a> · <a href="https://react.dev/reference/react/useActionState" target="_blank" rel="noopener noreferrer">useActionState</a></p>
           </div>
         </li>
@@ -580,12 +585,12 @@
           <div>
             <div class="t">GO 2: you read five diffs and messages, and click through the app once</div>
             <div class="who">you</div>
-            <p>On GO, I commit the five, merge <code>feat/core</code> into <code>main</code> with a merge commit, and open <code>feat/triage</code>. Your API key is already in <code>.env.local</code>.</p>
+            <p>On GO, I commit the five, merge <code>feat/core</code> into <code>main</code> with a merge commit, and open <code>feat/triage</code>. Your API key is already in <code>.env.local</code>.</p> <strong>☑ GO given.</strong>
           </div>
         </li>
 
         <li class="phase" id="gate-3">Gate 3 · AI module · feat/triage · 45 min</li>
-        <li id="step-7">
+        <li id="step-7" class="now">
           <span class="num">7</span>
           <div>
             <div class="t">The triage module</div>
@@ -724,8 +729,9 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+        <li><span class="when">Gate 2</span><span>Core app committed and merged into <code>main</code>: app setup, database, Docker, cases, responses, and reviews. 17 tests and 9 browser checks pass.</span></li>
       </ol>
-      <p>Next action: I build steps 2 to 6 on <code>feat/core</code>, then stop at GO 2.</p>
+      <p>Next action: gate 3, the AI triage module, on <code>feat/triage</code>.</p>
     </section>
   </main>
 </div>

@@ -25,7 +25,14 @@ export function CaseForm() {
         />
       </Field>
       <Field label="Trade" error={state.errors?.trade}>
-        <select name="trade" defaultValue={value("trade")} className={INPUT}>
+        {/* React resets the form after each submit, and a select only keeps the default it had
+            on its first render. The key remounts it, so the chosen trade survives an error. */}
+        <select
+          key={value("trade")}
+          name="trade"
+          defaultValue={value("trade")}
+          className={INPUT}
+        >
           <option value="">Choose a trade</option>
           {Object.entries(TRADE_LABELS).map(([trade, label]) => (
             <option key={trade} value={trade}>

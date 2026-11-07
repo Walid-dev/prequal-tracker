@@ -14,7 +14,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "db:generate": "drizzle-kit generate",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "better-sqlite3": "13.0.3",
