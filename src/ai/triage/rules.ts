@@ -42,6 +42,48 @@ function parseDay(value: string): Date | null {
     : date;
 }
 
+const MONTHS = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+/** Finds every real date written in a text, as YYYY-MM-DD: 2026-10-31, 2026/10/31, October 31, 2026, or 31 Oct 2026. */
+function datesIn(text: string): string[] {
+  const found: string[] = [];
+  const add = (year: string, month: number, day: string) => {
+    const iso = `${year}-${String(month).padStart(2, "0")}-${day.padStart(2, "0")}`;
+    if (month >= 1 && parseDay(iso)) found.push(iso);
+  };
+  const monthOf = (name: string) =>
+    MONTHS.findIndex((month) =>
+      month.startsWith(name.toLowerCase().slice(0, 3)),
+    ) + 1;
+  for (const m of text.matchAll(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/g)) {
+    add(m[1], Number(m[2]), m[3]);
+  }
+  for (const m of text.matchAll(
+    /\b([A-Za-z]{3,9})\.? (\d{1,2})(?:st|nd|rd|th)?,? (\d{4})\b/g,
+  )) {
+    add(m[3], monthOf(m[1]), m[2]);
+  }
+  for (const m of text.matchAll(
+    /\b(\d{1,2})(?:st|nd|rd|th)? ([A-Za-z]{3,9})\.?,? (\d{4})\b/g,
+  )) {
+    add(m[3], monthOf(m[2]), m[1]);
+  }
+  return found;
+}
+
 /** Applies every rule to the model's output. `today` is passed in, so tests and the eval never go stale. */
 export function applyRules(
   output: ModelOutput,
@@ -70,8 +112,15 @@ export function applyRules(
     notes.push(`Dropped ${dropped} flag(s) whose quote is not in the answer.`);
   }
 
-  // 2. An expiry date counts only when it is a real date and its own words are in the answer.
+  // 2. An expiry date counts only when it is a real date, its quote is in the answer,
+  //    and the latest date written in that quote is the same date.
   const facts = { ...output.facts };
+  const notBacked = (date: string, why: string) => {
+    notes.push(`Ignored the expiry date ${date}: ${why}`);
+    facts.expiryDate = null;
+    lowerTo("partial", "the expiry date isn't backed by the answer.");
+    if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
+  };
   if (facts.expiryDate) {
     const date = facts.expiryDate;
     if (!parseDay(date)) {
@@ -80,12 +129,13 @@ export function applyRules(
       lowerTo("partial", "the expiry date can't be read as a real date.");
       if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
     } else if (!inAnswer(facts.expiryQuote)) {
-      notes.push(
-        `Ignored the expiry date ${date}: the words behind it are not in the answer.`,
-      );
-      facts.expiryDate = null;
-      lowerTo("partial", "the expiry date isn't backed by the answer.");
-      if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
+      notBacked(date, "the words behind it are not in the answer.");
+    } else if (
+      datesIn(facts.expiryQuote ?? "")
+        .sort()
+        .at(-1) !== date
+    ) {
+      notBacked(date, "the quoted words don't state that date.");
     } else if (date < today) {
       // The document has expired, whatever the model said.
       const quote = facts.expiryQuote ?? date;

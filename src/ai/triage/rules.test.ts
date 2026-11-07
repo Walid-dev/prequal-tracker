@@ -160,4 +160,38 @@ describe("applyRules", () => {
     );
     expect(result.completeness).toBe("insufficient");
   });
+
+  it("ignores an expiry date that its quote doesn't state, in both directions (R4)", () => {
+    for (const [stated, extracted] of [
+      ["2026-10-31", "2027-08-31"],
+      ["2027-08-31", "2026-10-31"],
+    ]) {
+      const quote = `Expires ${stated}`;
+      const result = applyRules(
+        withExpiry(extracted, quote),
+        `${quote}.`,
+        TODAY,
+      );
+      expect(result.flags.some((flag) => flag.code === "expired")).toBe(false);
+      expect(result.facts.expiryDate).toBeNull();
+      expect(result.completeness).toBe("partial");
+      expect(result.ruleNotes.join(" ")).toMatch(/don't state that date/);
+    }
+  });
+
+  it("reads a written date in the quote, and uses the latest date of a range (R4)", () => {
+    const written = applyRules(
+      withExpiry("2026-10-31", "valid until October 31, 2026"),
+      "Clearance C-1, valid until October 31, 2026.",
+      TODAY,
+    );
+    expect(written.flags[0]).toMatchObject({ code: "expired", byRule: true });
+    const range = applyRules(
+      withExpiry("2026-05-01", "Valid from 2026-05-01 to 2027-05-01"),
+      "Valid from 2026-05-01 to 2027-05-01.",
+      TODAY,
+    );
+    expect(range.flags.some((flag) => flag.code === "expired")).toBe(false);
+    expect(range.completeness).toBe("partial");
+  });
 });
