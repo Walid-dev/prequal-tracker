@@ -4,6 +4,10 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
+- **2026-11-07 · Default model: Claude Sonnet 5.**
+  Why: in the eval (`docs/eval/2026-11-07-report.md`), Sonnet 5 and Haiku 4.5 both passed all 16 runs, and 8 cases can't separate them. Sonnet 5 is the stronger model for messier real answers, at about $0.006 per triage and 3.1 s.
+  Rejected: Opus 5 (14 of 16, stricter than the request on one case, about $0.017 per triage and 5.5 s). Haiku 4.5 stays a cheaper option through `AI_MODEL`.
+
 - **2026-11-07 · The subcontractor's answer goes alone in the user message. Our rules and the request go in the system instructions.**
   Why: research (`docs/research/ai-triage.md`) shows role separation lowers injection success, but only partly. So it's one layer. Rules in code and the reviewer's decision are the others.
 
@@ -74,7 +78,3 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 - **2026-11-07 · No streaming.**
   Why: the result is a structured note, not a chat. A short wait with a clear pending state is fine, and saved runs give an audit trail.
-
-## Pending
-
-- **Default model.** The eval at step 10 compares Haiku 4.5, Sonnet 5, and Opus 5. The owner picks from the numbers. Until then the default is `claude-opus-5`.
