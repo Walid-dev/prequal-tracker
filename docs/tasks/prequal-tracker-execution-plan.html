@@ -1,0 +1,803 @@
+<title>Prequal Tracker Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --board: #151b26;
+    --board-2: #1c2433;
+    --board-3: #243047;
+    --rule: #2d3a52;
+    --chalk: #e9e5d8;
+    --chalk-dim: #a9b1c2;
+    --marker: #f4c95d;
+    --mint: #8fd3b6;
+    --coral: #f2917e;
+    --sky: #9cc3ff;
+    --wire: #8f98aa;
+    --ink-hi: #f4f1ea;
+    --ink-sub: #c4c8d2;
+    --amber: #f0c35a;
+    --amber-fill: #3a3019;
+    --violet: #b8a2f2;
+    --violet-fill: #2a2240;
+    --blue: #8ab4f8;
+    --blue-fill: #1b2a44;
+    --green: #90d18c;
+    --green-fill: #1f3421;
+    --teal: #74d2b0;
+    --teal-fill: #1b342c;
+    --coral-fill: #3b221f;
+    --slate: #b9bfcc;
+    --slate-fill: #1b212d;
+    --read: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--board); }
+  body {
+    margin: 0;
+    background: var(--board);
+    color: var(--chalk);
+    font: 17px/1.68 var(--read);
+    padding-inline: 16px;
+    padding-block: 0 64px;
+  }
+  a { color: var(--sky); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--chalk); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--marker); outline-offset: 3px; border-radius: 3px; }
+  code { font: 0.86em/1.4 var(--mono); background: var(--board-2); border: 1px solid var(--rule); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  strong { color: #fff8e6; }
+
+  .layout { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; padding-top: 40px; font-size: 14.5px; }
+  .toc .hand-label { font: 700 12px/1.2 var(--read); letter-spacing: 0.1em; text-transform: uppercase; color: var(--marker); margin: 0 0 12px; }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .toc a { color: var(--chalk-dim); text-decoration: none; }
+  .toc a:hover { color: var(--chalk); text-decoration: underline; }
+  .toc .sub { padding-left: 14px; font-size: 13.5px; }
+  .toc-mobile { display: none; }
+
+  main { min-width: 0; max-width: 760px; }
+  header.doc-head { padding-top: 40px; padding-bottom: 8px; }
+  .eyebrow { font: 500 12.5px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--chalk-dim); margin: 0; }
+  h1 { font: 700 clamp(30px, 4.6vw, 44px)/1.12 var(--read); margin: 12px 0 10px; text-wrap: balance; letter-spacing: -0.01em; }
+  h1 .scribble { color: var(--marker); }
+  .lede { color: var(--chalk-dim); margin: 0 0 22px; max-width: 64ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; padding: 0; list-style: none; }
+  .chip { font-size: 13.5px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--rule); background: var(--board-2); color: var(--chalk); }
+  .chip b { color: var(--marker); font-weight: 700; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0 0 12px; }
+  .stat { border: 1px dashed var(--rule); border-radius: 10px; padding: 14px 16px; background: var(--board-2); }
+  .stat .num { white-space: nowrap; font: 700 22px/1.2 var(--read); font-variant-numeric: tabular-nums; color: #fff8e6; }
+  .stat .num .arrow { color: var(--marker); padding-inline: 4px; }
+  .stat .lbl { font-size: 14px; color: var(--chalk-dim); margin-top: 4px; line-height: 1.4; }
+
+  section { padding-top: 44px; }
+  h2 { font: 700 26px/1.25 var(--read); margin: 0 0 6px; text-wrap: balance; display: flex; align-items: baseline; gap: 12px; }
+  h2 .tag { font: 700 11.5px/1 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); border: 1px solid rgba(240, 195, 90, 0.5); border-radius: 999px; padding: 5px 9px; align-self: center; }
+  h3 { font: 700 19.5px/1.35 var(--read); margin: 30px 0 4px; text-wrap: balance; }
+  h3 .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink-hi); color: var(--board); font: 700 14px/1 var(--read); margin-right: 10px; vertical-align: 2px; }
+  p, li { max-width: 68ch; }
+  p { margin: 12px 0; }
+  ul, ol { padding-left: 22px; margin: 12px 0; }
+  li { margin: 6px 0; }
+  li::marker { color: var(--chalk-dim); }
+  .muted { color: var(--chalk-dim); }
+  .small { font-size: 14.5px; }
+  hr.chalk { border: 0; height: 2px; margin: 44px 0 0; background: repeating-linear-gradient(90deg, var(--rule) 0 14px, transparent 14px 22px); }
+
+  .verdict { border: 2px dashed var(--marker); border-radius: 14px 18px 12px 16px; padding: 16px 20px; margin: 20px 0; background: rgba(244, 201, 93, 0.06); }
+  .verdict .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); margin: 0 0 6px; }
+  .verdict p { margin: 6px 0; }
+  .aside { border-left: 0; padding: 12px 16px; margin: 18px 0; background: var(--board-2); border-radius: 10px; border: 1px solid var(--rule); font-size: 15.5px; }
+  .aside .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); margin: 0 0 6px; }
+
+  figure { margin: 22px 0 8px; }
+  .sketch { overflow-x: auto; border: 1px solid var(--rule); border-radius: 14px; background: radial-gradient(1200px 400px at 20% 0%, #1b2332 0%, var(--board-2) 60%); padding: 10px; }
+  .sketch svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  .sketch svg text { font-family: var(--read); }
+  figcaption { font-size: 14.5px; color: var(--chalk-dim); margin-top: 8px; max-width: 68ch; }
+
+  .tbl { overflow-x: auto; margin: 16px 0; border: 1px solid var(--rule); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.5; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  th { font: 700 12px/1.3 var(--read); text-transform: uppercase; letter-spacing: 0.07em; color: var(--chalk-dim); background: var(--board-2); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.hl { color: var(--marker); font-weight: 700; }
+  .sev { display: inline-block; font: 700 11.5px/1 var(--read); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+  .sev.high { color: #2a1712; background: var(--coral); }
+  .sev.med { color: #2b220a; background: var(--marker); }
+  .sev.low { color: #0e2219; background: var(--mint); }
+  .pill-go { color: var(--mint); font-weight: 700; }
+  .pill-no { color: var(--coral); font-weight: 700; }
+
+  .timeline { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 0; }
+  .timeline li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 16px; margin: 0; padding: 10px 0; border-top: 1px dashed var(--rule); max-width: none; }
+  .timeline li:first-child { border-top: 0; }
+  .timeline .when { font: 700 15px/1.5 var(--read); color: var(--marker); }
+
+  .stories { list-style: none; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+  .stories li { border: 1px solid var(--rule); background: var(--board-2); border-radius: 12px; padding: 14px 16px; margin: 0; max-width: none; }
+  .stories .t { font-weight: 700; color: #fff8e6; }
+  .stories .meta { font: 500 12.5px/1.4 var(--mono); color: var(--marker); margin-top: 2px; }
+  .stories p { margin: 6px 0 0; font-size: 15.5px; }
+
+  .decisions { list-style: none; padding: 0; display: grid; gap: 10px; }
+  .decisions li { margin: 0; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--rule); background: var(--board-2); max-width: none; }
+  .decisions .state { display: inline-block; font: 700 11.5px/1 var(--read); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; border: 1px solid currentColor; margin-right: 10px; vertical-align: 2px; }
+  .decisions .agreed .state { color: var(--mint); }
+  .decisions .open .state { color: var(--marker); }
+
+  .draft { border: 1px dashed var(--chalk-dim); border-radius: 12px; background: #121823; margin: 16px 0; }
+  .draft-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px dashed var(--rule); flex-wrap: wrap; }
+  .draft-head .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); margin: 0; }
+  .draft-body { padding: 4px 16px 12px; font-size: 15.5px; }
+  .draft-body p, .draft-body li { max-width: 72ch; }
+  button.copy { font: 600 13px/1 var(--read); color: var(--board); background: var(--marker); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  button.copy:hover { background: #ffd978; }
+
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .toc { display: none; }
+    .toc-mobile { display: block; margin: 0 0 8px; border: 1px solid var(--rule); border-radius: 10px; background: var(--board-2); padding: 10px 14px; }
+    .toc-mobile summary { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.1em; text-transform: uppercase; color: var(--marker); cursor: pointer; }
+    .toc-mobile ol { margin: 10px 0 4px; padding-left: 20px; font-size: 15px; }
+    main { max-width: none; }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 16.5px; }
+    .stats { grid-template-columns: minmax(0, 1fr); }
+    .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+
+  /* diagrams: solid tinted boxes; colour carries meaning (amber client, violet our servers, blue proxy/CDN/cache, green in use or good, teal the fix, red the problem, grey neutral) */
+  .box { stroke-width: 2.5; }
+  .c-amber { stroke: var(--amber); fill: var(--amber-fill); }
+  .c-violet { stroke: var(--violet); fill: var(--violet-fill); }
+  .c-blue { stroke: var(--blue); fill: var(--blue-fill); }
+  .c-green { stroke: var(--green); fill: var(--green-fill); }
+  .c-teal { stroke: var(--teal); fill: var(--teal-fill); }
+  .c-coral { stroke: var(--coral); fill: var(--coral-fill); }
+  .c-ghost { stroke: var(--slate); fill: var(--slate-fill); }
+  .t-title { font-size: 15px; font-weight: 700; fill: var(--ink-hi); }
+  .t-sub { font-size: 13px; fill: var(--ink-sub); }
+  .t-copy { font-size: 13.5px; font-weight: 600; fill: var(--slate); }
+  .t-label { font-size: 14px; font-weight: 700; fill: var(--ink-hi); }
+  .t-val { font-size: 14px; font-weight: 700; fill: var(--ink-hi); font-variant-numeric: tabular-nums; }
+  .t-note { font-size: 13px; fill: var(--chalk-dim); }
+  .t-link { font-size: 13px; font-weight: 700; fill: var(--sky); }
+  .t-sky { fill: var(--sky); }
+  .t-sep { fill: var(--chalk-dim); font-weight: 400; }
+  .sketch a { cursor: pointer; }
+  .sketch a:hover tspan, .sketch a:hover .t-link { text-decoration: underline; }
+  .sketch a:hover > .box { stroke-width: 3.5; }
+  .sketch a:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
+  .t-cname { font-weight: 400; fill: var(--ink-sub); }
+  .hit { fill: transparent; }
+  .sketch a:hover .hit { fill: rgba(156, 195, 255, 0.1); }
+  .dot-done { fill: var(--green); }
+  .dot-prog { fill: var(--amber); }
+  .dot-ready { fill: var(--blue); }
+  .dot-hold { fill: var(--slate); }
+  .dot-other { fill: none; stroke: var(--violet); stroke-width: 1.6; }
+  .dot-draft { fill: none; stroke: var(--slate); stroke-width: 1.6; stroke-dasharray: 2 2; }
+  .t-group { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+  .t-strong { font-weight: 700; }
+  .t-hot { fill: var(--coral); }
+  .t-good { fill: var(--green); }
+  .t-teal { fill: var(--teal); }
+  .t-amber { fill: var(--amber); }
+  .t-violet { fill: var(--violet); }
+  .t-blue { fill: var(--blue); }
+  .wire { stroke: var(--wire); stroke-width: 2; fill: none; stroke-linejoin: round; }
+  .wire.hot { stroke: var(--coral); stroke-width: 3; }
+  .wire.good { stroke: var(--green); }
+  .wire.dash { stroke-dasharray: 6 6; }
+  .head { fill: var(--wire); }
+  .head.hot { fill: var(--coral); }
+  .head.good { fill: var(--green); }
+  .badge { fill: var(--ink-hi); }
+  .badge-n { font-size: 14px; font-weight: 700; fill: #151b26; }
+  .zone { fill: none; stroke: var(--slate); stroke-width: 1.5; stroke-dasharray: 5 6; opacity: 0.6; }
+  .rule-violet { stroke: var(--violet); stroke-width: 1.5; opacity: 0.6; }
+  .cross { stroke: var(--teal); stroke-width: 4; stroke-linecap: round; fill: none; }
+  .bar-today { fill: #343c50; stroke: var(--slate); stroke-width: 1.5; }
+  .bar-new { fill: var(--green-fill); stroke: var(--green); stroke-width: 2; }
+
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  html { scroll-behavior: smooth; }
+  /* plan page: workstream lanes with card chips coloured by status */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 14px 0 6px; padding: 0; list-style: none; font-size: 13.5px; color: var(--chalk-dim); }
+  .legend li { display: flex; align-items: center; gap: 6px; margin: 0; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; display: inline-block; }
+  .lanes { display: grid; gap: 14px; margin: 18px 0; }
+  .lane { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; background: var(--board-2); }
+  .lane-name { font: 700 12px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--chalk-dim); margin: 0 0 10px; }
+  .row { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .row + .row { margin-top: 10px; }
+  .rowlab { margin: 0; padding-top: 9px; font: 600 13px/1.35 var(--read); color: var(--chalk-dim); max-width: none; }
+  .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  @media (max-width: 560px) { .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } .rowlab { padding-top: 0; } }
+  .card { min-width: 0; flex: 0 1 196px; border: 2px solid; border-radius: 10px; padding: 8px 10px; font-size: 14px; line-height: 1.35; }
+  .card a { font-weight: 700; text-decoration: none; }
+  .card a:hover { text-decoration: underline; }
+  .card .what { display: block; color: var(--ink-hi); }
+  .card .own { font-weight: 700; color: var(--violet); }
+  .card .st { display: block; font-size: 12.5px; color: var(--ink-sub); margin-top: 3px; }
+  .st-done { border-color: var(--green); background: var(--green-fill); }
+  .st-prog { border-color: var(--amber); background: var(--amber-fill); }
+  .st-ready { border-color: var(--blue); background: var(--blue-fill); }
+  .st-hold { border-color: var(--slate); background: var(--slate-fill); }
+  .st-other { border-color: var(--violet); background: var(--violet-fill); }
+  .st-draft { border-style: dashed; }
+  .steps { list-style: none; padding: 0; display: grid; gap: 10px; counter-reset: none; }
+  .steps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; margin: 0; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--board-2); max-width: none; }
+  .steps .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink-hi); color: var(--board); font: 700 14px/1 var(--read); }
+  .steps .t { font-weight: 700; color: var(--ink-hi); }
+  .steps .who { font: 500 12.5px/1.4 var(--mono); color: var(--marker); margin-top: 2px; }
+  .steps p { margin: 4px 0 0; font-size: 15.5px; }
+  .steps .chk { font-size: 14px; color: var(--ink-sub); }
+  .steps .prod { font-size: 13.5px; color: var(--chalk-dim); }
+  .steps li.now { border-color: var(--marker); }
+  /* plan page extras for this build: step details, gate rows, budget bars */
+  .steps .files { font: 13px/1.55 var(--mono); color: var(--chalk-dim); overflow-wrap: anywhere; }
+  .steps .commit { font: 500 13px/1.4 var(--mono); color: var(--mint); overflow-wrap: anywhere; }
+  .steps .ref { font-size: 14px; color: var(--chalk-dim); }
+  .steps li.gate { grid-template-columns: 34px minmax(0, 1fr); border-style: dashed; border-color: var(--marker); background: rgba(244, 201, 93, 0.05); }
+  .steps li.gate .num { background: var(--marker); }
+  .steps li.done .num { background: var(--green); }
+  .steps li.phase { display: block; border: 0; background: none; padding: 18px 2px 0; font: 700 12px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); }
+  /* hovercard:start */
+  /* hover cards: a short plain description of the card, MR, commit or file a link points to */
+  .hovercard { position: fixed; z-index: 50; width: max-content; max-width: min(340px, calc(100vw - 16px)); padding: 10px 12px 11px; border-radius: 10px; background: var(--board-3); border: 1px solid var(--rule); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45); color: var(--chalk); font: 14px/1.45 var(--read); pointer-events: none; }
+  .hovercard .hc-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-weight: 700; color: var(--ink-hi); }
+  .hovercard .hc-status { font: 700 10.5px/1 var(--read); letter-spacing: 0.07em; text-transform: uppercase; color: var(--marker); border: 1px solid rgba(240, 195, 90, 0.5); border-radius: 999px; padding: 3px 7px; }
+  .hovercard p { margin: 5px 0 0; max-width: none; }
+  /* hovercard:end */
+</style>
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <p class="hand-label">contents</p>
+    <ol>
+      <li><a href="#picture">The big picture</a></li>
+      <li><a href="#budget">Time budget</a></li>
+      <li><a href="#steps">The steps</a></li>
+      <li class="sub"><a href="#step-0">0 · Pre-flight</a></li>
+      <li class="sub"><a href="#gate-1">Gate 1 · Plan</a></li>
+      <li class="sub"><a href="#gate-2">Gate 2 · Core app</a></li>
+      <li class="sub"><a href="#gate-3">Gate 3 · AI module</a></li>
+      <li class="sub"><a href="#gate-4">Gate 4 · Proof and docs</a></li>
+      <li class="sub"><a href="#gate-5">Gate 5 · Review</a></li>
+      <li><a href="#waiting">Waiting on you</a></li>
+      <li><a href="#after">After the build</a></li>
+      <li><a href="#done">Done already</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-head">
+      <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
+      <h1>Prequal Tracker <span class="scribble">build</span></h1>
+      <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. Design and decisions live in the <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer">kickoff page</a>.</p>
+      <p class="small muted">Status: gate 1 approved and committed. Step 2 of 12 in progress on <code>feat/core</code>. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
+      <ul class="chips">
+        <li class="chip">Now: <b>step 2</b></li>
+        <li class="chip">Commits: <b>1 of 12</b></li>
+        <li class="chip">Gates: <b>1 of 5</b></li>
+        <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
+        <li class="chip">Active time: <b>about 15 min</b></li>
+      </ul>
+    </header>
+
+    <details class="toc-mobile">
+      <summary>Contents</summary>
+      <ol>
+        <li><a href="#picture">The big picture</a></li>
+        <li><a href="#budget">Time budget</a></li>
+        <li><a href="#steps">The steps</a></li>
+        <li><a href="#waiting">Waiting on you</a></li>
+        <li><a href="#after">After the build</a></li>
+        <li><a href="#done">Done already</a></li>
+      </ol>
+    </details>
+
+    <section id="picture">
+      <h2>The big picture</h2>
+      <p>Gathered requirements, one locked plan, five gates. Each build gate is one feature branch merged into <code>main</code> with a merge commit, so the history shows the branches the assignment asks for. Nothing here touches production, and nothing is pushed: the repo stays on your machine until you push it from your own GitHub account.</p>
+      <figure>
+        <div class="sketch">
+          <svg viewBox="0 0 1000 336" role="img" aria-label="The gathered requirements led to the locked kickoff page and this plan. The plan runs as five gates in order: plan, core app, AI module, proof and docs, and an independent review, each listing its steps. Sharing on GitHub comes after.">
+            <defs>
+              <marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+            </defs>
+
+            <rect x="16" y="20" width="180" height="80" rx="12" class="box c-ghost"/>
+            <text x="106" y="50" text-anchor="middle" class="t-title">Requirements</text>
+            <text x="106" y="70" text-anchor="middle" class="t-sub">gathered, researched</text>
+            <text x="106" y="88" text-anchor="middle" class="t-note">request tracker + AI</text>
+            <path d="M196,60 H232" class="wire" marker-end="url(#m1)"/>
+
+            <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer" aria-label="Kickoff v3: decisions locked">
+              <rect x="236" y="20" width="200" height="80" rx="12" class="box c-green"/>
+              <text x="336" y="50" text-anchor="middle" class="t-title">Kickoff v3</text>
+              <text x="336" y="70" text-anchor="middle" class="t-sub">design, decisions locked</text>
+              <text x="336" y="89" text-anchor="middle" class="t-link">kickoff page</text>
+            </a>
+            <path d="M436,60 H472" class="wire" marker-end="url(#m1)"/>
+
+            <a href="#steps" aria-label="This plan: the steps">
+              <rect x="476" y="20" width="200" height="80" rx="12" class="box c-blue"/>
+              <text x="576" y="50" text-anchor="middle" class="t-title">This plan</text>
+              <text x="576" y="70" text-anchor="middle" class="t-sub">12 commits, then review</text>
+              <text x="576" y="89" text-anchor="middle" class="t-link">the steps</text>
+            </a>
+            <path d="M676,60 H712" class="wire dash" marker-end="url(#m1)"/>
+
+            <a href="#after" aria-label="After the build: share on GitHub">
+              <rect x="716" y="20" width="200" height="80" rx="12" class="box c-ghost" stroke-dasharray="6 5"/>
+              <text x="816" y="50" text-anchor="middle" class="t-title">Share on GitHub</text>
+              <text x="816" y="70" text-anchor="middle" class="t-sub">you push, at the end</text>
+              <text x="816" y="89" text-anchor="middle" class="t-link">after the build</text>
+            </a>
+
+            <path d="M576,100 V124 H104 V150" class="wire" marker-end="url(#m1)"/>
+            <text x="340" y="118" text-anchor="middle" class="t-note">runs as five gates, in order</text>
+
+            <rect x="16" y="154" width="176" height="166" rx="12" class="box c-blue"/>
+            <text x="30" y="178" class="t-title">Gate 1 · Plan</text>
+            <text x="30" y="196" class="t-sub">main · 15 min</text>
+            <a href="#step-1" aria-label="Step 1 plan, rules">
+              <rect x="24" y="208" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="37" cy="217.5" r="4.5" class="dot-done"/>
+              <text x="48" y="222" class="t-link">Step 1<tspan class="t-cname"> plan, rules</tspan></text>
+            </a>
+            <path d="M192,178 H208" class="wire" marker-end="url(#m1)"/>
+            <rect x="212" y="154" width="176" height="166" rx="12" class="box c-blue"/>
+            <text x="226" y="178" class="t-title">Gate 2 · Core app</text>
+            <text x="226" y="196" class="t-sub">feat/core · 60 min</text>
+            <a href="#step-2" aria-label="Step 2 scaffold">
+              <rect x="220" y="208" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="233" cy="217.5" r="4.5" class="dot-prog"/>
+              <text x="244" y="222" class="t-link">Step 2<tspan class="t-cname"> scaffold</tspan></text>
+            </a>
+            <a href="#step-3" aria-label="Step 3 database">
+              <rect x="220" y="227" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="233" cy="236.5" r="4.5" class="dot-ready"/>
+              <text x="244" y="241" class="t-link">Step 3<tspan class="t-cname"> database</tspan></text>
+            </a>
+            <a href="#step-4" aria-label="Step 4 Docker">
+              <rect x="220" y="246" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="233" cy="255.5" r="4.5" class="dot-ready"/>
+              <text x="244" y="260" class="t-link">Step 4<tspan class="t-cname"> Docker</tspan></text>
+            </a>
+            <a href="#step-5" aria-label="Step 5 cases">
+              <rect x="220" y="265" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="233" cy="274.5" r="4.5" class="dot-ready"/>
+              <text x="244" y="279" class="t-link">Step 5<tspan class="t-cname"> cases</tspan></text>
+            </a>
+            <a href="#step-6" aria-label="Step 6 reviews">
+              <rect x="220" y="284" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="233" cy="293.5" r="4.5" class="dot-ready"/>
+              <text x="244" y="298" class="t-link">Step 6<tspan class="t-cname"> reviews</tspan></text>
+            </a>
+            <path d="M388,178 H404" class="wire" marker-end="url(#m1)"/>
+            <rect x="408" y="154" width="176" height="166" rx="12" class="box c-blue"/>
+            <text x="422" y="178" class="t-title">Gate 3 · AI module</text>
+            <text x="422" y="196" class="t-sub">feat/triage · 45 min</text>
+            <a href="#step-7" aria-label="Step 7 triage module">
+              <rect x="416" y="208" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="429" cy="217.5" r="4.5" class="dot-ready"/>
+              <text x="440" y="222" class="t-link">Step 7<tspan class="t-cname"> triage module</tspan></text>
+            </a>
+            <a href="#step-8" aria-label="Step 8 triage UI">
+              <rect x="416" y="227" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="429" cy="236.5" r="4.5" class="dot-ready"/>
+              <text x="440" y="241" class="t-link">Step 8<tspan class="t-cname"> triage UI</tspan></text>
+            </a>
+            <path d="M584,178 H600" class="wire" marker-end="url(#m1)"/>
+            <rect x="604" y="154" width="176" height="166" rx="12" class="box c-blue"/>
+            <text x="618" y="178" class="t-title">Gate 4 · Proof, docs</text>
+            <text x="618" y="196" class="t-sub">feat/proof · 45 min</text>
+            <a href="#step-9" aria-label="Step 9 eval cases">
+              <rect x="612" y="208" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="625" cy="217.5" r="4.5" class="dot-ready"/>
+              <text x="636" y="222" class="t-link">Step 9<tspan class="t-cname"> eval cases</tspan></text>
+            </a>
+            <a href="#step-10" aria-label="Step 10 live eval">
+              <rect x="612" y="227" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="625" cy="236.5" r="4.5" class="dot-ready"/>
+              <text x="636" y="241" class="t-link">Step 10<tspan class="t-cname"> live eval</tspan></text>
+            </a>
+            <a href="#step-11" aria-label="Step 11 CI">
+              <rect x="612" y="246" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="625" cy="255.5" r="4.5" class="dot-ready"/>
+              <text x="636" y="260" class="t-link">Step 11<tspan class="t-cname"> CI</tspan></text>
+            </a>
+            <a href="#step-12" aria-label="Step 12 README">
+              <rect x="612" y="265" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="625" cy="274.5" r="4.5" class="dot-ready"/>
+              <text x="636" y="279" class="t-link">Step 12<tspan class="t-cname"> README</tspan></text>
+            </a>
+            <path d="M780,178 H796" class="wire" marker-end="url(#m1)"/>
+            <rect x="800" y="154" width="176" height="166" rx="12" class="box c-blue"/>
+            <text x="814" y="178" class="t-title">Gate 5 · Review</text>
+            <text x="814" y="196" class="t-sub">Codex · after gate 4</text>
+            <a href="#step-13" aria-label="Step 13 Codex review">
+              <rect x="808" y="208" width="160" height="19" rx="5" class="hit"/>
+              <circle cx="821" cy="217.5" r="4.5" class="dot-ready"/>
+              <text x="832" y="222" class="t-link">Step 13<tspan class="t-cname"> Codex review</tspan></text>
+            </a>
+          </svg>
+        </div>
+        <figcaption>Each step line opens its step card below, and the kickoff box opens the design page. The gates run left to right. A gate starts only after you say GO on the one before it. Gate 5 is a review of the whole repo by a different model.</figcaption>
+      </figure>
+      <ul class="legend">
+        <li><span class="sw st-ready"></span>Not started</li>
+        <li><span class="sw st-prog"></span>In progress</li>
+        <li><span class="sw st-done"></span>Done</li>
+        <li><span class="sw st-hold st-draft"></span>After the build</li>
+      </ul>
+    </section>
+
+    <section id="budget">
+      <h2>Time budget</h2>
+      <p>The budget counts active time, not clock time: the work can pause between gates and pick up later. The core (gates 1 to 3) is planned at 2 hours, the assignment's target. Gate 4 brings it to 2 h 45, which leaves 15 minutes of buffer inside the 3-hour budget. The hard stop is 3 h 30 of active time: whatever state we're in, we stop there and the README says what's left. I log active time per gate in <code>docs/process.md</code>. The gate 5 review is logged on its own line.</p>
+      <figure>
+        <div class="sketch">
+          <svg viewBox="0 0 960 170" role="img" aria-label="Time budget to scale: gate 1 15 minutes, gate 2 60, gate 3 45, gate 4 45, for 2 hours 45 in total, against the 2-hour target, our 3-hour budget, and a hard stop at 3 hours 30.">
+            <text x="30" y="34" class="t-note">0</text>
+            <rect x="30" y="56" width="60" height="40" rx="6" class="box c-blue"/>
+            <text x="60" y="81" text-anchor="middle" class="t-label">1</text>
+            <rect x="90" y="56" width="240" height="40" rx="6" class="box c-blue"/>
+            <text x="210" y="81" text-anchor="middle" class="t-label">Gate 2 · 60 min</text>
+            <rect x="330" y="56" width="180" height="40" rx="6" class="box c-blue"/>
+            <text x="420" y="81" text-anchor="middle" class="t-label">Gate 3 · 45 min</text>
+            <rect x="510" y="56" width="180" height="40" rx="6" class="box c-teal"/>
+            <text x="600" y="81" text-anchor="middle" class="t-label">Gate 4 · 45 min</text>
+            <rect x="690" y="56" width="60" height="40" rx="6" class="box c-ghost" stroke-dasharray="4 4"/>
+            <text x="720" y="81" text-anchor="middle" class="t-note">buffer</text>
+
+            <path d="M510,42 V112" class="wire dash"/>
+            <text x="510" y="132" text-anchor="middle" class="t-note">2 h · target</text>
+            <path d="M750,42 V112" class="wire"/>
+            <text x="750" y="132" text-anchor="middle" class="t-sub t-strong">3 h · budget</text>
+            <path d="M870,42 V112" class="wire hot"/>
+            <text x="870" y="132" text-anchor="middle" class="t-sub t-hot t-strong">3 h 30 · stop</text>
+            <text x="60" y="122" text-anchor="middle" class="t-note">15 min</text>
+            <text x="30" y="160" class="t-note">Scale: 4 px per minute. Gate 1 is the plan, gate 2 the core app, gate 3 the AI module, gate 4 proof and docs.</text>
+          </svg>
+        </div>
+        <figcaption>Drawn to scale, in minutes of active time. The core ends exactly at the 2-hour target, and the proof work fits inside the 3-hour budget with a small buffer before the hard stop.</figcaption>
+      </figure>
+    </section>
+
+    <section id="steps">
+      <h2>The steps</h2>
+      <p>One card per commit. "Files" lists what the commit adds or changes. "Check" is how we know it worked, written so it can fail. At each gate row you read the diffs and the messages, then say GO, and I commit and merge. Every commit ends with the <code>Co-Authored-By: Claude</code> line.</p>
+
+      <ol class="steps">
+        <li id="step-0" class="done">
+          <span class="num">0</span>
+          <div>
+            <div class="t">Pre-flight and git setup</div>
+            <div class="who">I · 2 min · no commit</div>
+            <p>Confirm the tools are ready, then start git in the project folder.</p>
+            <p class="chk">Check: Node 22 and npm are installed, port 3000 is free, Docker runs a test container, and git is initialized.</p>
+            <p class="chk"><strong>☑ Done.</strong> Node 22.18, npm 10.9, and Docker 27.4 ready, and port 3000 free.</p>
+          </div>
+        </li>
+
+        <li class="phase" id="gate-1">Gate 1 · Plan · on main · 15 min</li>
+        <li id="step-1" class="done">
+          <span class="num">1</span>
+          <div>
+            <div class="t">Plan, decision log, and agent rules</div>
+            <div class="who">I write · you check at gate 1</div>
+            <p>The written plan the build follows, before any code: the spec with acceptance criteria and how the plan changed from v1 to v3, the decision log, the process log with the build clock started, the agent rules, and this page. No code yet.</p>
+            <p class="files">Files: README.md (stub) · CLAUDE.md · docs/PLAN.md · docs/decisions.md · docs/process.md · docs/tasks/prequal-tracker-execution-plan.html · .gitignore · .env.example</p>
+            <p class="chk">Check: <code>git status --short</code> lists exactly those 8 files. A search for work names, local machine paths, and API key prefixes finds nothing, and there are no em dashes.</p>
+            <p class="commit">docs(repo): add plan, decision log, and agent rules</p>
+            <p class="chk"><strong>☑ Done.</strong> Committed on <code>main</code>.</p>
+            <p class="ref">Format: <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank" rel="noopener noreferrer">Conventional Commits</a></p>
+          </div>
+        </li>
+        <li class="gate">
+          <span class="num">G1</span>
+          <div>
+            <div class="t">GO 1: you read the 8 files and the message</div>
+            <div class="who">you</div>
+            <p>On GO, I commit on <code>main</code> and open the branch <code>feat/core</code>. <strong>☑ GO given.</strong></p>
+          </div>
+        </li>
+
+        <li class="phase" id="gate-2">Gate 2 · Core app · feat/core · 60 min</li>
+        <li id="step-2" class="now">
+          <span class="num">2</span>
+          <div>
+            <div class="t">Scaffold the app</div>
+            <div class="who">I</div>
+            <p>Generate Next.js 16.4.5 in a temporary folder and copy it in, so nothing we wrote is overwritten. Then pin every version exactly and add Vitest and tsx. Classic caching, no Cache Components. No features yet.</p>
+            <p class="files">Files: package.json · package-lock.json · tsconfig.json · next.config.ts · biome.json · vitest.config.mts · src/app/layout.tsx · src/app/page.tsx · src/app/globals.css · src/smoke.test.ts</p>
+            <p class="chk">Check: <code>npm run lint</code>, <code>npm run typecheck</code>, <code>npm test</code>, and <code>npm run build</code> all pass, and <code>npm run dev</code> serves a page on localhost:3000.</p>
+            <p class="commit">chore(repo): scaffold next.js app with typescript, tailwind, biome, and vitest</p>
+            <p class="ref">Docs: <a href="https://nextjs.org/docs/app/api-reference/cli/create-next-app" target="_blank" rel="noopener noreferrer">create-next-app</a> · <a href="https://nextjs.org/docs/app/guides/upgrading/version-16" target="_blank" rel="noopener noreferrer">Next.js 16 changes</a> · <a href="https://biomejs.dev/guides/getting-started/" target="_blank" rel="noopener noreferrer">Biome</a> · <a href="https://vitest.dev/guide/" target="_blank" rel="noopener noreferrer">Vitest</a></p>
+          </div>
+        </li>
+        <li id="step-3">
+          <span class="num">3</span>
+          <div>
+            <div class="t">Database: schema, first migration, seed, health check</div>
+            <div class="who">I</div>
+            <p>Five tables in one Drizzle schema (cases, requests, responses, triage_runs, reviews), the first SQL migration, migrations applied when the server starts, demo seed data, and a health route. The database opens lazily, so <code>next build</code> never touches it. Still no screens.</p>
+            <p class="files">Files: src/db/schema.ts · src/db/client.ts · src/db/migrate.ts · src/db/seed.ts · src/instrumentation.ts · drizzle.config.ts · drizzle/0000_*.sql · src/app/api/health/route.ts · src/db/db.test.ts</p>
+            <p class="chk">Check: deleting <code>data/app.db</code> and starting the server recreates it, <code>curl localhost:3000/api/health</code> returns <code>{"ok":true}</code>, and running the seed twice still gives one set of demo cases.</p>
+            <p class="commit">feat(db): add schema, first migration, seed, and health check</p>
+            <p class="ref">Docs: <a href="https://orm.drizzle.team/docs/get-started-sqlite" target="_blank" rel="noopener noreferrer">Drizzle with SQLite</a> · <a href="https://orm.drizzle.team/docs/migrations" target="_blank" rel="noopener noreferrer">Drizzle migrations</a> · <a href="https://nextjs.org/docs/app/guides/instrumentation" target="_blank" rel="noopener noreferrer">instrumentation</a></p>
+          </div>
+        </li>
+        <li id="step-4">
+          <span class="num">4</span>
+          <div>
+            <div class="t">Docker, early</div>
+            <div class="who">I · timebox 20 min</div>
+            <p>The app as a non-root container, built on Debian bookworm, with the database on a named volume. Every name starts with <code>prequal-tracker</code>, and the only commands are <code>docker compose</code> commands in this folder, so other projects on the machine are never touched. Fallback if startup migrations fail in the image: run them in the container's start command instead.</p>
+            <p class="files">Files: Dockerfile · .dockerignore · compose.yaml</p>
+            <p class="chk">Check: <code>docker compose up --build -d</code>, then the health route answers ok. After <code>docker compose down</code> and <code>up</code> again, the seeded cases are still there. No <code>.env</code> file is inside the image.</p>
+            <p class="commit">chore(docker): add image and compose with a persistent volume</p>
+            <p class="ref">Docs: <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/output" target="_blank" rel="noopener noreferrer">standalone output</a> · <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose</a></p>
+          </div>
+        </li>
+        <li id="step-5">
+          <span class="num">5</span>
+          <div>
+            <div class="t">Cases and checklists</div>
+            <div class="who">I</div>
+            <p>List cases, open a case for a subcontractor, and get that trade's checklist. Every trade gets WSIB clearance, a liability insurance certificate, and COR or a written safety program. Electricians also get their ESA licence number. Responses come in the next step.</p>
+            <p class="files">Files: src/domain/checklists.ts · src/domain/cases.ts · their tests · src/app/cases/page.tsx · src/app/cases/new/page.tsx · src/app/cases/new/case-form.tsx · src/app/cases/actions.ts · src/app/cases/[id]/page.tsx · src/components/status-pill.tsx</p>
+            <p class="chk">Check: an electrical case gets 4 requests including the ESA licence, a plumbing case gets 3, and the form shows an error next to a bad email instead of saving it.</p>
+            <p class="commit">feat(cases): create subcontractor cases with a checklist per trade</p>
+            <p class="ref">Domain: <a href="https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction" target="_blank" rel="noopener noreferrer">WSIB clearance</a> · <a href="https://www.ihsa.ca/COR/COR-FAQs.aspx" target="_blank" rel="noopener noreferrer">COR</a> · <a href="https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/" target="_blank" rel="noopener noreferrer">ESA licence</a></p>
+          </div>
+        </li>
+        <li id="step-6">
+          <span class="num">6</span>
+          <div>
+            <div class="t">Responses and reviews</div>
+            <div class="who">I</div>
+            <p>The tracker loop. The subcontractor answers (a form clearly labeled as the demo stand-in for their side). The reviewer accepts or requests changes, with a name and a note. Every event lands on a timeline. Accept is refused without a response, in the service and in the UI.</p>
+            <p class="files">Files: src/domain/requests.ts · src/domain/requests.test.ts · src/domain/flow.test.ts · src/app/requests/[id]/page.tsx · src/app/requests/[id]/response-form.tsx · src/app/requests/[id]/review-form.tsx · src/app/requests/actions.ts</p>
+            <p class="chk">Check: a test proves that accepting without a response throws, the flow test moves progress from 0 of 3 to 1 of 3, and a request sent back returns to Responded after a new answer.</p>
+            <p class="commit">feat(requests): respond, accept, and request changes with an audit timeline</p>
+            <p class="ref">Docs: <a href="https://nextjs.org/docs/app/getting-started/mutating-data" target="_blank" rel="noopener noreferrer">Server Actions</a> · <a href="https://react.dev/reference/react/useActionState" target="_blank" rel="noopener noreferrer">useActionState</a></p>
+          </div>
+        </li>
+        <li class="gate">
+          <span class="num">G2</span>
+          <div>
+            <div class="t">GO 2: you read five diffs and messages, and click through the app once</div>
+            <div class="who">you</div>
+            <p>On GO, I commit the five, merge <code>feat/core</code> into <code>main</code> with a merge commit, and open <code>feat/triage</code>. Your API key is already in <code>.env.local</code>.</p>
+          </div>
+        </li>
+
+        <li class="phase" id="gate-3">Gate 3 · AI module · feat/triage · 45 min</li>
+        <li id="step-7">
+          <span class="num">7</span>
+          <div>
+            <div class="t">The triage module</div>
+            <div class="who">I</div>
+            <p>The AI feature as one self-contained folder. It builds the context, makes one Claude call through the AI SDK with a Zod schema, applies the rules (expired dates, quotes that must exist, an 8,000-character cap, can only lower), and reports tokens, cost, and time. It knows nothing about the database. Mock mode uses stored fixture answers, some with deliberate mistakes so the rules get exercised. A thin service saves each run and never touches request status.</p>
+            <p class="files">Files: src/ai/triage/schema.ts · prompt.ts · rules.ts · model.ts · fixtures.ts · triage.ts · rules.test.ts · triage.test.ts · src/domain/triage.ts · src/domain/triage.test.ts</p>
+            <p class="chk">Check: tests prove that an expired date lowers the result to partial with an EXPIRED flag, a quote not in the answer is dropped, the rules never raise, schema failures and timeouts save a failed run, and triage leaves the request status unchanged. One live call with your key returns a valid result for under $0.02.</p>
+            <p class="commit">feat(triage): add response triage module with structured output and rules</p>
+            <p class="ref">Docs: <a href="https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data" target="_blank" rel="noopener noreferrer">AI SDK structured output</a> · <a href="https://ai-sdk.dev/docs/ai-sdk-core/testing" target="_blank" rel="noopener noreferrer">AI SDK testing</a> · <a href="https://ai-sdk.dev/providers/ai-sdk-providers/anthropic" target="_blank" rel="noopener noreferrer">Anthropic provider</a> · <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener noreferrer">Building effective agents</a></p>
+          </div>
+        </li>
+        <li id="step-8">
+          <span class="num">8</span>
+          <div>
+            <div class="t">Triage on the request page</div>
+            <div class="who">I</div>
+            <p>The reviewer sees the AI note next to the review buttons: completeness, summary, flags with their quotes, what the rules changed, drafted questions, model, tokens, cost, and time. "Request changes" opens with the drafted questions filled in. A mode badge always says mock or live.</p>
+            <p class="files">Files: src/app/requests/[id]/triage-panel.tsx · src/app/requests/actions.ts · src/app/requests/[id]/page.tsx · src/app/requests/[id]/review-form.tsx</p>
+            <p class="chk">Check: in mock mode, the seeded expired-clearance answer shows Partial with "lowered by rule", "Request changes" opens with the questions, and a failed run shows its error and a retry button.</p>
+            <p class="commit">feat(triage): show triage results on the request page</p>
+          </div>
+        </li>
+        <li class="gate">
+          <span class="num">G3</span>
+          <div>
+            <div class="t">GO 3: you read two diffs, run one triage in the app</div>
+            <div class="who">you</div>
+            <p>On GO, I commit, merge <code>feat/triage</code> into <code>main</code>, and open <code>feat/proof</code>.</p>
+          </div>
+        </li>
+
+        <li class="phase" id="gate-4">Gate 4 · Proof and docs · feat/proof · 45 min · hard stop at 3 h 30</li>
+        <li id="step-9">
+          <span class="num">9</span>
+          <div>
+            <div class="t">Eval cases and runner</div>
+            <div class="who">I write · you review the labels before the commit</div>
+            <p>Eight cases with the expected answers: complete insurance, coverage below the requirement, expired WSIB clearance, a vague "will send later", a hidden instruction, a name mismatch, a complete COR, and a missing licence number. The runner scores them and writes a report. Mock mode runs in CI, and live mode is one command. The labels are committed before any live run.</p>
+            <p class="files">Files: evals/cases.json · evals/run.ts · evals/score.ts · evals/score.test.ts · package.json scripts</p>
+            <p class="chk">Check: <code>npm run eval</code> in mock mode scores 8 of 8 and exits 0, and changing one expected label makes it exit 1.</p>
+            <p class="commit">test(eval): add labeled triage cases and the eval runner</p>
+          </div>
+        </li>
+        <li id="step-10">
+          <span class="num">10</span>
+          <div>
+            <div class="t">Live eval report</div>
+            <div class="who">I run, after your OK on the quote</div>
+            <p>One paid run: 8 cases, 2 runs each, on Haiku 4.5, Sonnet 5, and Opus 5. That's 48 calls, about $0.60 at today's prices. I quote the exact figure first, and you pick the default model from the table.</p>
+            <p class="files">Files: docs/eval/2026-11-07-report.md · .env.example (default model)</p>
+            <p class="chk">Check: the report has a row per case for every model, plus totals for tokens and cost, and the real spend stays under 3 times the quote.</p>
+            <p class="commit">docs(eval): add the first live eval report</p>
+            <p class="ref">Prices: <a href="https://docs.anthropic.com/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">Claude pricing</a></p>
+          </div>
+        </li>
+        <li id="step-11">
+          <span class="num">11</span>
+          <div>
+            <div class="t">CI</div>
+            <div class="who">I</div>
+            <p>On every push, GitHub runs lint, typecheck, tests, the mock eval, and the build, with no secrets and no paid calls. It proves itself on your first push.</p>
+            <p class="files">Files: .github/workflows/ci.yml</p>
+            <p class="chk">Check: the same commands pass in a clean clone in my scratch folder, starting from <code>npm ci</code>.</p>
+            <p class="commit">chore(ci): run lint, typecheck, tests, and the mock eval on every push</p>
+            <p class="ref">Docs: <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer">GitHub Actions</a></p>
+          </div>
+        </li>
+        <li id="step-12">
+          <span class="num">12</span>
+          <div>
+            <div class="t">README and process notes</div>
+            <div class="who">I</div>
+            <p>The front door. The README opens with the time spent, then covers how to run it (Docker or npm), what it does, a five-step demo, the AI design and why it's one call, the eval headline, what was cut, the path to production, and how the approach applies to a legacy system. <code>docs/process.md</code> gets its time log, how AI output was verified, and transcript excerpts.</p>
+            <p class="files">Files: README.md · docs/process.md · docs/PLAN.md · docs/tasks/prequal-tracker-execution-plan.html</p>
+            <p class="chk">Check: following the README from a clean clone with only Docker works, and the leak search (work names, local paths, work email, key prefixes) comes back empty.</p>
+            <p class="commit">docs(readme): write the readme, demo script, and process notes</p>
+          </div>
+        </li>
+        <li class="gate">
+          <span class="num">G4</span>
+          <div>
+            <div class="t">GO 4: you read four diffs and the README</div>
+            <div class="who">you</div>
+            <p>On GO, I commit, merge <code>feat/proof</code> into <code>main</code>, and close the build time log.</p>
+          </div>
+        </li>
+
+        <li class="phase" id="gate-5">Gate 5 · Independent review · after gate 4 · logged separately</li>
+        <li id="step-13">
+          <span class="num">13</span>
+          <div>
+            <div class="t">Review by a second model</div>
+            <div class="who">you run Codex (model to be named) · I prepare the brief and fix what you accept</div>
+            <p>The model that wrote the code shouldn't be its only reviewer. I write a short review brief: what the repo does, where to look, and the rules it should hold to. You run it through Codex. Each finding you accept becomes its own <code>fix(...)</code> commit on <code>fix/review</code>. Each finding you reject gets one line in <code>docs/process.md</code> saying why.</p>
+            <p class="files">Files: docs/review/brief.md · docs/review/findings.md · one fix commit per accepted finding</p>
+            <p class="chk">Check: every finding is either fixed in a commit that names it or answered in <code>findings.md</code>, and lint, typecheck, tests, and the mock eval still pass after the fixes.</p>
+            <p class="commit">docs(review): add the review brief and findings, then fix(...) per finding</p>
+          </div>
+        </li>
+        <li class="gate">
+          <span class="num">G5</span>
+          <div>
+            <div class="t">GO 5: you read the findings and the fixes</div>
+            <div class="who">you</div>
+            <p>On GO, I merge <code>fix/review</code> into <code>main</code>. The repo is then ready for you to push.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="waiting">
+      <h2>Waiting on you</h2>
+      <p>Nothing waits on anyone else. These wait on you, at known points:</p>
+      <ul>
+        <li>a GO at each of the 4 gates;</li>
+        <li>☑ <code>ANTHROPIC_API_KEY</code> in <code>.env.local</code> (done; I never open key files);</li>
+        <li>a review of the eval labels before step 9 is committed;</li>
+        <li>an OK on the cost quote before step 10;</li>
+        <li>the Codex model name, and running the review at step 13.</li>
+      </ul>
+    </section>
+
+    <section id="after">
+      <h2>After the build</h2>
+      <p>These are outside the build clock and not part of the submission's code.</p>
+      <ul>
+        <li><strong>Share (you).</strong> I run the leak search one last time and give you the exact commands. You create the repo on your GitHub account, push, and either make it public or give the reviewer access. Check: CI turns green on GitHub.</li>
+        <li><strong>Private prep (I).</strong> The HTML explainer with diagrams, and the interview questions with answers built on the real eval numbers. Private artifacts, never in the repo.</li>
+      </ul>
+    </section>
+
+    <section id="done">
+      <h2>Done already</h2>
+      <ol class="timeline">
+        <li><span class="when">Context</span><span>Gathered the requirements and reviewed a first draft plan from another AI model. A research pass read the real published packages: Next.js is 16.4.5, the AI SDK is 7.0.164, and the draft's <code>maxSteps</code> and <code>toDataStreamResponse</code> no longer exist.</span></li>
+        <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
+        <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
+        <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+      </ol>
+      <p>Next action: I build steps 2 to 6 on <code>feat/core</code>, then stop at GO 2.</p>
+    </section>
+  </main>
+</div>
+<!-- hovercard:start -->
+<script type="application/json" id="link-tips">{"https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX":{"t":"Kickoff v3 · Prequal Tracker","s":"Decisions locked 2026-11-07","d":"The design page this plan builds from: the domain, the AI design, what was cut, the time decision, and a glossary of every tool in the stack."},"https://www.conventionalcommits.org/en/v1.0.0/":{"t":"Conventional Commits 1.0.0","s":"","d":"The commit message format used for every commit here: type(scope): summary, for example feat(triage): add the triage module."},"https://nextjs.org/docs/app/api-reference/cli/create-next-app":{"t":"create-next-app","s":"Next.js docs","d":"The official generator for a new Next.js app. Step 2 runs it with TypeScript, Tailwind, the App Router, a src folder, and Biome."},"https://nextjs.org/docs/app/guides/upgrading/version-16":{"t":"Upgrading to Next.js 16","s":"Next.js docs","d":"What changed in version 16, such as async params, Turbopack by default, and middleware renamed to proxy. The agent rules in CLAUDE.md follow it."},"https://biomejs.dev/guides/getting-started/":{"t":"Biome","s":"","d":"One tool that formats the code and flags likely mistakes. It runs as npm run lint, locally and in CI."},"https://vitest.dev/guide/":{"t":"Vitest","s":"","d":"The test runner for our unit tests and the end-to-end flow test. It runs as npm test."},"https://orm.drizzle.team/docs/get-started-sqlite":{"t":"Drizzle with SQLite","s":"Drizzle docs","d":"How Drizzle connects to a SQLite file through better-sqlite3. Our five tables are defined this way in one schema file."},"https://orm.drizzle.team/docs/migrations":{"t":"Drizzle migrations","s":"Drizzle docs","d":"How schema changes become numbered SQL files in git, applied in order. This is the database versioning part of the build."},"https://nextjs.org/docs/app/guides/instrumentation":{"t":"Next.js instrumentation","s":"Next.js docs","d":"A hook that runs once when the server starts. We use it to apply database migrations before the first request."},"https://nextjs.org/docs/app/api-reference/config/next-config-js/output":{"t":"Standalone output","s":"Next.js docs","d":"A build mode that bundles only the server and the files it uses, which keeps the Docker image small."},"https://docs.docker.com/compose/":{"t":"Docker Compose","s":"Docker docs","d":"Runs the app container from one file, with its port, settings, and the named volume that keeps the database between restarts."},"https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction":{"t":"WSIB clearance in construction","s":"Ontario policy","d":"WSIB policy that requires a hiring contractor in construction to get a clearance certificate for each contractor it hires directly. It is the first item on every checklist."},"https://www.ihsa.ca/COR/COR-FAQs.aspx":{"t":"COR, Certificate of Recognition","s":"IHSA","d":"IHSA's certification of a company's health and safety program, often required on Ontario construction projects. A checklist item for every trade."},"https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/":{"t":"ESA electrical contractor licence","s":"Electrical Safety Authority","d":"Ontario's licence for electrical contractors, shown as a 7-digit number on contracts. The extra checklist item for electrical subcontractors."},"https://nextjs.org/docs/app/getting-started/mutating-data":{"t":"Server Actions","s":"Next.js docs","d":"Functions that run on the server when a form is submitted. Every write in the app goes through one: create a case, respond, review, run triage."},"https://react.dev/reference/react/useActionState":{"t":"useActionState","s":"React docs","d":"The React hook our forms use to show a pending state and the errors a server action returns."},"https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data":{"t":"AI SDK structured output","s":"AI SDK docs","d":"How generateText with an output schema returns JSON checked against a Zod schema. The triage result comes back this way."},"https://ai-sdk.dev/docs/ai-sdk-core/testing":{"t":"AI SDK testing","s":"AI SDK docs","d":"The SDK's mock language models for tests. Our fixture mock is built on MockLanguageModelV4, so tests and CI never call the real API."},"https://ai-sdk.dev/providers/ai-sdk-providers/anthropic":{"t":"AI SDK Anthropic provider","s":"AI SDK docs","d":"The adapter that connects the AI SDK to Claude models. It reads the API key from ANTHROPIC_API_KEY."},"https://www.anthropic.com/engineering/building-effective-agents":{"t":"Building effective agents","s":"Anthropic engineering","d":"Anthropic's guidance to use simple workflows when the steps are predictable and agents only when they are not. It backs the one-call design."},"https://docs.anthropic.com/en/docs/about-claude/pricing":{"t":"Claude pricing","s":"Anthropic docs","d":"Per-token prices for each Claude model. The eval quote and the cost shown on each triage run use these numbers."},"https://docs.github.com/en/actions":{"t":"GitHub Actions","s":"GitHub docs","d":"GitHub's CI service. Our workflow runs lint, typecheck, tests, the mock eval, and the build on every push."},"https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR":{"t":"Prequal Tracker build plan","s":"Live runbook","d":"This page, published as an artifact. It is republished after every step, so the link always shows the current state of the build."}}</script>
+<div id="hovercard" class="hovercard" role="tooltip" hidden></div>
+<script>
+/* Hover cards: show the description from #link-tips when a link is hovered or focused. */
+(function () {
+  var tips = {};
+  try { tips = JSON.parse(document.getElementById('link-tips').textContent); } catch (e) { return; }
+  var card = document.getElementById('hovercard');
+  var timer = null, current = null;
+  function linkOf(node) { return node && node.closest ? node.closest('a[href]') : null; }
+  function show(a) {
+    var t = tips[a.getAttribute('href')];
+    if (!t || !t.d) return;
+    card.textContent = '';
+    if (t.t) {
+      var title = document.createElement('div');
+      title.className = 'hc-title';
+      title.textContent = t.t;
+      if (t.s) {
+        var status = document.createElement('span');
+        status.className = 'hc-status';
+        status.textContent = t.s;
+        title.appendChild(status);
+      }
+      card.appendChild(title);
+    }
+    var text = document.createElement('p');
+    text.textContent = t.d;
+    card.appendChild(text);
+    card.hidden = false;
+    var r = a.getBoundingClientRect();
+    var x = Math.min(Math.max(8, r.left), window.innerWidth - card.offsetWidth - 8);
+    var y = r.bottom + 8;
+    if (y + card.offsetHeight > window.innerHeight - 8) y = r.top - card.offsetHeight - 8;
+    card.style.left = x + 'px';
+    card.style.top = Math.max(8, y) + 'px';
+    a.setAttribute('aria-describedby', 'hovercard');
+    current = a;
+  }
+  function hide() {
+    clearTimeout(timer);
+    card.hidden = true;
+    if (current) current.removeAttribute('aria-describedby');
+    current = null;
+  }
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType === 'touch') return;
+    var a = linkOf(e.target);
+    if (!a || a === current) return;
+    clearTimeout(timer);
+    timer = setTimeout(function () { show(a); }, 150);
+  });
+  document.addEventListener('pointerout', function (e) {
+    var a = linkOf(e.target);
+    if (a && !a.contains(e.relatedTarget)) hide();
+  });
+  document.addEventListener('focusin', function (e) { var a = linkOf(e.target); if (a) show(a); });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
+  window.addEventListener('scroll', function () {
+    if (card.hidden) return;
+    card.hidden = true;
+    if (current) current.removeAttribute('aria-describedby');
+    current = null;
+  }, { passive: true });
+})();
+</script>
+<!-- hovercard:end -->
+<script>
+  /* no copy buttons on this page; the hover-card script is added below */
+</script>
