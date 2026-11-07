@@ -1,5 +1,43 @@
 # Review findings
 
+## Confirmation, 2026-11-07 · `9f9956d`
+
+**R4, R6, R8, and R9 are resolved for their original reproductions.** One additional medium finding in the added date parser remains (R10 below). Recommendation: request changes. Review confidence: **95%**; ship confidence: **80%**. The original failures no longer reproduce, and the requested checks pass; the parser still accepts an invalid month token as evidence for a valid date.
+
+Reviewed the latest `fix/review` commit, including fixes `543f003`, `f8984f5`, `c329da0`, and `70b245d`. The triage source matched the committed versions.
+
+| Finding | Status | Original reproduction rerun |
+| --- | --- | --- |
+| **R4 · medium** | **Resolved** | Both mismatches, quoted `2026-10-31` with extracted `2027-08-31` and the reverse, now return partial, clear the extracted date, and request confirmation. No false expired flag is added. Verified through both `applyRules` and structured mock `runTriage` calls. See [rules.ts:139](../../src/ai/triage/rules.ts#L139). |
+| **R6 · medium** | **Resolved** | Eight ordinary flags followed by an expired or suspicious-instruction flag retain the warning in the eight-item result, at the front, marked `byRule`, with a confirmation note. Both original cases passed with partial completeness and an existing generic question. See [rules.ts:145](../../src/ai/triage/rules.ts#L145). |
+| **R8 · low** | **Resolved** | The corrected fixture has neutral facts: with truncation disabled it stays complete, with no rule notes. The real call returns partial with the truncation note. An in-memory mutation removing propagation of `message.truncated` returns complete and fails the corrected completeness and note expectations. No source file was edited for this check. See [triage.test.ts:163](../../src/ai/triage/triage.test.ts#L163). |
+| **R9 · low** | **Resolved** | Read the command from the committed README: `anthropic:claude-sonnet-5` resolves successfully; the old unprefixed ID still rejects. Only model construction was checked, with no generation or network call. See [README.md:106](../../README.md#L106). |
+
+**Checks:** `npm run lint` passed (51 files); `npm run typecheck` passed; `npm test` passed (**50 tests**, 9 files); the mock eval passed (**8/8**, **$0.0000**), run as `AI_MODE=mock node --import tsx evals/run.ts`. No paid calls were made.
+
+**Other triage checks:** ISO, slash-separated, written dates and date ranges behaved as expected. Completeness never increased across the three ratings with steering and truncation enabled or disabled. Existing schema, failure-path, quote-grounding, fixture, pricing, and service tests passed. No further regressions were observed in these checks; R10 is the remaining validation gap.
+
+### R10 · medium · New: the date parser accepts non-month words
+
+**Where:** [src/ai/triage/rules.ts:72](../../src/ai/triage/rules.ts#L72).
+
+```ts
+  const monthOf = (name: string) =>
+    MONTHS.findIndex((month) =>
+      month.startsWith(name.toLowerCase().slice(0, 3)),
+    ) + 1;
+```
+
+**What is wrong:** Month recognition checks only the first three letters of any three-to-nine-letter word. Consequently, `Octopus` counts as October and `Marching` counts as March.
+
+**Why it matters:** Answer and quote `Expires Octopus 31, 2027`, with extracted date `2027-10-31`, return complete with that date retained and no rule notes. The new source-date check therefore treats an invalid date statement as verified evidence instead of requesting a real date.
+
+**Suggested fix:** Match the entire month token against full month names and an explicit set of supported abbreviations. Reject other words and add tests for invalid words sharing a valid month's prefix.
+
+**Concept:** Input validation must check the whole token; a matching prefix does not establish a valid month.
+
+**Checked:** Reproduced independently with both `Octopus 31, 2027` and `Marching 1, 2027`. Calendar validation checks the synthesized ISO date after the invalid word has already been converted to a month, so it does not reject these inputs. **Confidence: 100%.**
+
 ## Follow-up, 2026-11-07 · `c750aec`
 
 **Not all resolved.** R1, R2, R3, R5, and R7 are addressed. R4 and R6 remain partly fixed; two new low-severity findings are below. Recommendation: request changes. Review confidence: **95%**; ship confidence: **70%**. The fixes were traced through their callers and checked with mock models and in-memory SQLite; the remaining guardrail failures were reproduced independently.
@@ -297,3 +335,13 @@ Fixes for the four follow-up findings, on the same branch. Each new test fails o
 | R9 | The README command uses `--models=anthropic:claude-sonnet-5`. | `70b245d` | Checked by hand: the model resolver accepts the new ID and rejects the old one, with no network call. |
 
 After the follow-up fixes: lint, typecheck, 50 tests, the migration check, the mock eval (8 of 8), and the build pass.
+
+## Confirmation fix
+
+The fix for the finding from the confirmation pass, on the same branch. The new test fails on the code before the fix and passes after it.
+
+| ID | Fix | Commit | Test |
+| --- | --- | --- | --- |
+| R10 | A month word counts only when it is a full month name, a three-letter short form, or "sept". Any other word, such as "Octopus", gives no date. The expiry date is then not backed, so the result is capped at partial and a question asks to confirm the date. | `f2bbacd` | `src/ai/triage/rules.test.ts`: "reads only real month names and short forms in a quote (R10)" |
+
+After this fix: lint, typecheck, 51 tests, the migration check, the mock eval (8 of 8), and the build pass.

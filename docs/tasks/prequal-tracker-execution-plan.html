@@ -283,7 +283,7 @@
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
       <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. The spec lives in <code>docs/PLAN.md</code>, the design in <code>docs/tasks/prequal-tracker-design.html</code>, and the decisions in <code>docs/decisions.md</code>.</p>
-      <p class="small muted">Status: all five gates done. The second model reviewed in two passes and found nine issues. All nine are fixed on <code>fix/review</code>, ready to merge through a pull request.</p>
+      <p class="small muted">Status: all five gates done. The second model reviewed the repo and re-checked each round of fixes. All ten findings are fixed on <code>fix/review</code>, ready to merge through a pull request.</p>
       <ul class="chips">
         <li class="chip">Now: <b>merge the PR</b></li>
         <li class="chip">Commits: <b>12 of 12</b></li>
@@ -692,7 +692,7 @@
             <p class="files">Files: docs/review/brief.md · docs/review/findings.md · one fix commit per accepted finding</p>
             <p class="chk">Check: every finding is either fixed in a commit that names it or answered in <code>findings.md</code>, and lint, typecheck, tests, and the mock eval still pass after the fixes.</p>
             <p class="commit">docs(review): add the review brief and findings, then fix(...) per finding</p>
-            <p class="chk"><strong>☑ Done.</strong> Nine findings over two passes (1 high, 5 medium, 3 low), all reproduced and fixed. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 50 tests and the mock eval pass.</p>
+            <p class="chk"><strong>☑ Done.</strong> Ten findings (1 high, 6 medium, 3 low), all reproduced and fixed. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 51 tests and the mock eval pass.</p>
           </div>
         </li>
         <li class="gate">
@@ -734,7 +734,7 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
-        <li><span class="when">Review</span><span>Codex (GPT Sol 6.1) reviewed the whole repo against the brief. It checked the fixes in a second pass. All nine findings were fixed on <code>fix/review</code>, and one setting now picks the model and the provider.</span></li>
+        <li><span class="when">Review</span><span>Codex (GPT Sol 6.1) reviewed the whole repo against the brief. It re-checked each round of fixes. All ten findings were fixed on <code>fix/review</code>, and one setting now picks the model and the provider.</span></li>
         <li><span class="when">Shared</span><span>Pushed to a private GitHub repository. Added the design page, <code>docs/tasks/prequal-tracker-design.html</code>, in the same format as this page, and the review brief, <code>docs/review/brief.md</code>.</span></li>
         <li><span class="when">Gate 4</span><span>Eval (8 of 8 in mock mode, three models live), CI, README, and process notes committed and merged into <code>main</code>.</span></li>
         <li><span class="when">Gate 3</span><span>AI module committed and merged into <code>main</code>: the triage module with its research-backed guards, and the triage panel. 34 tests and 10 browser checks pass.</span></li>

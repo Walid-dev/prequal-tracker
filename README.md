@@ -110,7 +110,7 @@ Eight cases make a regression check, not proof of robustness. They show the pipe
 
 ## Tests and CI
 
-- `npm test`: 50 tests for the business rules, the AI rules, every failure path of the triage call (mock models), the triage service, and the eval scoring. A service-level flow test runs case → answer → accept → progress on a real SQLite database.
+- `npm test`: 51 tests for the business rules, the AI rules, every failure path of the triage call (mock models), the triage service, and the eval scoring. A service-level flow test runs case → answer → accept → progress on a real SQLite database.
 - `npm run lint` (Biome) and `npm run typecheck`.
 - GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, typecheck, tests, the mock eval, the migration check, and the build on every push. There are no secrets and no paid calls.
 
@@ -150,7 +150,7 @@ The same loop works on an old codebase, in a safer order:
 
 ## How it was built
 
-Built with Claude Code, in four gates, each reviewed before it was committed. A second AI model (Codex, GPT Sol 6.1) then reviewed the whole repo against [docs/review/brief.md](docs/review/brief.md). It reviewed in two passes, the whole repo and then the fixes. All nine findings were fixed: see [docs/review/findings.md](docs/review/findings.md).
+Built with Claude Code, in four gates, each reviewed before it was committed. A second AI model (Codex, GPT Sol 6.1) then reviewed the whole repo against [docs/review/brief.md](docs/review/brief.md). It reviewed the whole repo, then re-checked each round of fixes. All ten findings were fixed: see [docs/review/findings.md](docs/review/findings.md).
 
 The two HTML pages open in any browser. GitHub shows their source, so download them or open them from a clone.
 
