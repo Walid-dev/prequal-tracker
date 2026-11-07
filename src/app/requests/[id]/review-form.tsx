@@ -1,12 +1,13 @@
 "use client";
 // The reviewer's decision form: accept the latest answer, or send it back with a note.
-import { useActionState } from "react";
+// The AI's drafted questions are offered with one click, never filled in silently.
+import { useActionState, useRef } from "react";
 import type { FormState } from "../actions";
 
 type Props = {
   action: (previous: FormState, formData: FormData) => Promise<FormState>;
   defaultReviewer: string;
-  defaultNote?: string;
+  suggestedNote?: string;
   triageRunId?: number;
 };
 
@@ -17,10 +18,11 @@ const INPUT =
 export function ReviewForm({
   action,
   defaultReviewer,
-  defaultNote,
+  suggestedNote,
   triageRunId,
 }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
+  const note = useRef<HTMLTextAreaElement>(null);
 
   return (
     <form action={formAction} className="space-y-3">
@@ -41,9 +43,10 @@ export function ReviewForm({
       <label className="block text-sm font-medium text-slate-700">
         Note (required to request changes)
         <textarea
+          ref={note}
           name="note"
           rows={4}
-          defaultValue={state.values?.note ?? defaultNote ?? ""}
+          defaultValue={state.values?.note ?? ""}
           className={INPUT}
         />
         {state.errors?.note?.[0] ? (
@@ -52,6 +55,17 @@ export function ReviewForm({
           </span>
         ) : null}
       </label>
+      {suggestedNote ? (
+        <button
+          type="button"
+          onClick={() => {
+            if (note.current) note.current.value = suggestedNote;
+          }}
+          className="text-sm text-sky-700 hover:underline"
+        >
+          Insert the AI's follow-up questions
+        </button>
+      ) : null}
       {state.error ? (
         <p className="text-sm text-red-600">{state.error}</p>
       ) : null}

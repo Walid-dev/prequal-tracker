@@ -10,6 +10,7 @@ import {
   reviewRequest,
   submitResponse,
 } from "@/domain/requests";
+import { settingsFromEnv, triageLatestAnswer } from "@/domain/triage";
 
 export type FormState = {
   ok?: boolean;
@@ -33,6 +34,22 @@ export async function submitResponseAction(
     submitResponse(getDb(), requestId, parsed.data.body);
   } catch (error) {
     if (error instanceof RuleError) return { error: error.message, values };
+    throw error;
+  }
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/** Runs AI triage on the latest answer and saves the run. It never changes the request's status. */
+export async function runTriageAction(
+  requestId: number,
+  _previous: FormState,
+  _formData: FormData,
+): Promise<FormState> {
+  try {
+    await triageLatestAnswer(getDb(), requestId, settingsFromEnv());
+  } catch (error) {
+    if (error instanceof RuleError) return { error: error.message };
     throw error;
   }
   revalidatePath("/", "layout");

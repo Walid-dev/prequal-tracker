@@ -28,6 +28,8 @@ AI SDK 7:
 - Use `instructions`, not `system`.
 - Do not use `maxSteps`, `experimental_output`, `generateObject`, or `toDataStreamResponse`. They are removed or deprecated.
 - Read tokens from `result.usage.inputTokens` and `result.usage.outputTokens`.
+- For a schema with a custom check, use `jsonSchema(zodSchema(Schema).jsonSchema, { validate })`. The provider gets the strict schema, and `validate` runs our own check.
+- Check `finishReason` and `rawFinishReason` before reading `result.output`. A refusal or a cut-off is not a result.
 - For tests, use `MockLanguageModelV4` from `ai/test`. A result needs `content`, `finishReason: { unified, raw }`, `usage` in the V4 nested shape, and `warnings: []`.
 
 Next.js 16:
@@ -58,6 +60,7 @@ Drizzle:
 ## Commands
 
 - Run `npm run lint`, `npm run typecheck`, and `npm test` before every commit. All three must pass.
+- `tsx` runs `.ts` scripts as CommonJS here. Wrap top-level `await` in an `async function main()`.
 - `npm run eval` runs the eval in mock mode. `npm run eval:live` is paid: run it only with the owner's OK.
 
 ## Git

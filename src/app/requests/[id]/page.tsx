@@ -4,9 +4,15 @@ import { notFound } from "next/navigation";
 import { StatusPill } from "@/components/status-pill";
 import { getDb } from "@/db/client";
 import { getRequestDetail, type TimelineEvent } from "@/domain/requests";
-import { reviewAction, submitResponseAction } from "../actions";
+import { settingsFromEnv, triageResultOf } from "@/domain/triage";
+import {
+  reviewAction,
+  runTriageAction,
+  submitResponseAction,
+} from "../actions";
 import { ResponseForm } from "./response-form";
 import { ReviewForm } from "./review-form";
+import { TriagePanel } from "./triage-panel";
 
 const CARD = "rounded-lg border border-slate-200 bg-white p-4";
 
@@ -16,7 +22,10 @@ export default async function RequestPage({
   const { id } = await params;
   const detail = getRequestDetail(getDb(), Number(id));
   if (!detail) notFound();
-  const { request, case: item, latestResponse, timeline } = detail;
+  const { request, case: item, latestResponse, latestRun, timeline } = detail;
+  const questions = latestRun
+    ? triageResultOf(latestRun)?.followUpQuestions
+    : undefined;
 
   return (
     <div className="space-y-6">
@@ -54,6 +63,13 @@ export default async function RequestPage({
         )}
       </section>
 
+      <TriagePanel
+        run={latestRun}
+        hasAnswer={Boolean(latestResponse)}
+        mode={settingsFromEnv().mode}
+        action={runTriageAction.bind(null, request.id)}
+      />
+
       <section className={CARD}>
         <h2 className="text-sm font-semibold text-slate-500">Review</h2>
         {request.status === "responded" ? (
@@ -61,6 +77,8 @@ export default async function RequestPage({
             <ReviewForm
               action={reviewAction.bind(null, request.id)}
               defaultReviewer={item.owner}
+              suggestedNote={questions?.join("\n")}
+              triageRunId={latestRun?.id}
             />
           </div>
         ) : (
