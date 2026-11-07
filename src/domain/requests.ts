@@ -41,6 +41,11 @@ export const ReviewSchema = z
       .string()
       .trim()
       .max(2000, { error: "Keep the note under 2,000 characters." }),
+    // The answer the reviewer was looking at. A decision on an older answer is refused.
+    responseId: z.coerce
+      .number()
+      .int()
+      .positive({ error: "Reload the page and review again." }),
     triageRunId: z.coerce.number().int().positive().optional(),
   })
   .refine((review) => review.action === "accept" || review.note.length >= 3, {
@@ -107,6 +112,11 @@ export function reviewRequest(
       .limit(1)
       .get();
     if (!latest) throw new RuleError("There is no response to review.");
+    if (latest.id !== input.responseId) {
+      throw new RuleError(
+        "A newer answer arrived while you were reviewing. Reload the page and review it first.",
+      );
+    }
 
     // Link the triage run only if it belongs to the answer being reviewed.
     const run = input.triageRunId

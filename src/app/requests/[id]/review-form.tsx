@@ -8,6 +8,7 @@ type Props = {
   action: (previous: FormState, formData: FormData) => Promise<FormState>;
   defaultReviewer: string;
   suggestedNote?: string;
+  responseId: number;
   triageRunId?: number;
 };
 
@@ -19,6 +20,7 @@ export function ReviewForm({
   action,
   defaultReviewer,
   suggestedNote,
+  responseId,
   triageRunId,
 }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
@@ -26,6 +28,7 @@ export function ReviewForm({
 
   return (
     <form action={formAction} className="space-y-3">
+      <input type="hidden" name="responseId" value={responseId} />
       <input type="hidden" name="triageRunId" value={triageRunId ?? ""} />
       <label className="block text-sm font-medium text-slate-700">
         Your name
