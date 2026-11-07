@@ -56,6 +56,11 @@ const MONTHS = [
   "november",
   "december",
 ];
+// Flags that matter most to the reviewer. They go first, so the flag cap never removes them.
+const SAFETY: ReadonlySet<FlagCode> = new Set([
+  "expired",
+  "suspicious_instructions",
+]);
 
 /** Finds every real date written in a text, as YYYY-MM-DD: 2026-10-31, 2026/10/31, October 31, 2026, or 31 Oct 2026. */
 function datesIn(text: string): string[] {
@@ -121,6 +126,7 @@ export function applyRules(
     lowerTo("partial", "the expiry date isn't backed by the answer.");
     if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
   };
+  let expiredByRule = false;
   if (facts.expiryDate) {
     const date = facts.expiryDate;
     if (!parseDay(date)) {
@@ -137,14 +143,17 @@ export function applyRules(
     ) {
       notBacked(date, "the quoted words don't state that date.");
     } else if (date < today) {
-      // The document has expired, whatever the model said.
-      const quote = facts.expiryQuote ?? date;
-      if (!grounded.some((flag) => flag.code === "expired")) {
-        ruleFlags.push({ code: "expired", quote, byRule: true });
-        notes.push(
-          `Flagged by rule: the expiry date ${date} is before today (${today}).`,
-        );
-      }
+      // The document has expired, whatever the model said. The rule's flag replaces any model flag for it.
+      expiredByRule = true;
+      const modelSaidSo = grounded.some((flag) => flag.code === "expired");
+      ruleFlags.push({
+        code: "expired",
+        quote: facts.expiryQuote ?? date,
+        byRule: true,
+      });
+      notes.push(
+        `${modelSaidSo ? "Confirmed" : "Flagged"} by rule: the expiry date ${date} is before today (${today}).`,
+      );
       lowerTo("partial", `the expiry date ${date} is before today (${today}).`);
       if (questions.length === 0) {
         questions.push(
@@ -157,16 +166,17 @@ export function applyRules(
   // 3. Wording that tries to steer the review is flagged for the reviewer, and the answer can't be complete.
   const steering = answer.match(STEERING);
   if (steering) {
-    if (!grounded.some((flag) => flag.code === "suspicious_instructions")) {
-      ruleFlags.push({
-        code: "suspicious_instructions",
-        quote: steering[0],
-        byRule: true,
-      });
-      notes.push(
-        "Flagged by rule: the answer contains wording aimed at the review.",
-      );
-    }
+    const modelSaidSo = grounded.some(
+      (flag) => flag.code === "suspicious_instructions",
+    );
+    ruleFlags.push({
+      code: "suspicious_instructions",
+      quote: steering[0],
+      byRule: true,
+    });
+    notes.push(
+      `${modelSaidSo ? "Confirmed" : "Flagged"} by rule: the answer contains wording aimed at the review.`,
+    );
     lowerTo(
       "partial",
       "an answer that tries to steer the review can't be complete.",
@@ -181,8 +191,16 @@ export function applyRules(
     lowerTo("partial", "the model read only part of the answer.");
   }
 
-  // 5. Keep the note short enough to read. Rule flags go first, so the cap never removes them.
-  const all = [...ruleFlags, ...grounded];
+  // 5. Keep the note short enough to read. Rule flags go first, then the model's safety flags,
+  //    then everything else, so the cap never removes a safety warning.
+  const modelFlags = grounded.filter(
+    (flag) => !(expiredByRule && flag.code === "expired"),
+  );
+  const all = [
+    ...ruleFlags,
+    ...modelFlags.filter((flag) => SAFETY.has(flag.code)),
+    ...modelFlags.filter((flag) => !SAFETY.has(flag.code)),
+  ];
   const unique = all.filter(
     (flag, index) =>
       all.findIndex(
