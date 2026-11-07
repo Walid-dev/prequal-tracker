@@ -4,6 +4,9 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
+- **2026-11-07 · Sample answers live in one file.**
+  Why: the demo seed, the mock model, and the eval all need the same subcontractor answers. One file (`src/samples/answers.ts`) avoids three copies that drift apart. It holds inputs only. The expected results live with the eval, so they can be committed before the first live run.
+
 - **2026-11-07 · Independent review by a second AI model before sharing.**
   Why: the model that wrote the code shouldn't be the only one that reviews it. A different model (Codex) reviews the finished repo, and each finding is fixed in its own commit or answered in writing.
 

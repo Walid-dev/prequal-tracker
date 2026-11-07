@@ -1,0 +1,30 @@
+# Runs the app with its SQLite database on a named volume, so the data survives restarts.
+# Every name here starts with prequal-tracker, so it never touches other projects on the machine.
+name: prequal-tracker
+
+services:
+  app:
+    build: .
+    image: prequal-tracker:local
+    container_name: prequal-tracker-app
+    ports:
+      - "${PORT:-3000}:3000"
+    # Optional local settings, such as AI_MODE and ANTHROPIC_API_KEY. Read at run time, never built into the image.
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      DATABASE_PATH: /data/app.db
+      # Adds the two demo cases on first start, only while the database has no cases.
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+    volumes:
+      - data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  data:
+    name: prequal-tracker-data

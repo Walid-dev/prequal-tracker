@@ -1,0 +1,6 @@
+/* Global styles: loads Tailwind and sets a system font, so builds never download fonts. */
+@import "tailwindcss";
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}

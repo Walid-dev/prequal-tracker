@@ -10,7 +10,7 @@ The work can pause between gates and resume later, so this log records active ti
 | --- | --- |
 | Planning (requirements, research, plan v0 to v3) | about 2 h, over two sessions |
 | Build, gate 1: plan | about 15 min |
-| Build, gate 2: core app | |
+| Build, gate 2: core app | about 30 min |
 | Build, gate 3: AI module | |
 | Build, gate 4: proof and docs | |
 | Independent review | |
@@ -44,6 +44,13 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 - **Library versions were checked, not assumed.** A first draft from another AI model used AI SDK 4 calls (`maxSteps`, `toDataStreamResponse()`) that no longer exist in version 7. Reading the published type files caught it before any code was written. `CLAUDE.md` now lists the current calls.
 - **Package tags were checked.** `npm install prisma` resolves to an 8.0 release candidate where SQLite is experimental. That finding led to Drizzle.
 - **Outside claims were source-checked.** Two claims from AI reviews, a company founding year and a "standard" insurance limit, had no source behind them and were left out.
+- **Browser checks backed up the unit tests.** A real browser drove every form. It caught a dropdown that lost its value after a validation error, which was fixed in the same step.
+
+## Plan changes during the build
+
+- **Step 2:** no placeholder test. Real tests start in step 3. The page check used the production build's rendered output instead of a dev server.
+- **Step 3 to step 6:** the demo seed moved to step 6, because it needs the checklists (step 5) and real answers (step 6).
+- **Step 6:** the eight sample answers live in one file, `src/samples/answers.ts`. The demo seed uses them now; the mock model (step 7) and the eval (step 9) will reuse the same texts.
 
 ## Transcript excerpts
 
