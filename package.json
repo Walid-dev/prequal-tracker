@@ -15,12 +15,13 @@
     "test": "vitest run --passWithNoTests",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
-    "seed": "tsx scripts/seed.ts",
+    "seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
     "eval": "tsx evals/run.ts",
     "eval:live": "tsx --env-file=.env.local evals/run.ts --live"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.98",
+    "@ai-sdk/openai": "4.0.110",
     "ai": "7.0.164",
     "better-sqlite3": "13.0.3",
     "drizzle-orm": "0.45.4",

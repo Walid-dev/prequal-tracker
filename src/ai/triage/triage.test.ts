@@ -2,6 +2,7 @@
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
 import { sampleAnswer } from "@/samples/answers";
+import { liveModel } from "./model";
 import { runTriage, type TriageInput } from "./triage";
 
 const USAGE = {
@@ -17,7 +18,7 @@ const USAGE = {
 /** A model that always answers with this text and finish reason. */
 function modelAnswering(
   text: string,
-  unified: "stop" | "length" = "stop",
+  unified: "stop" | "length" | "error" | "other" = "stop",
   raw = "end_turn",
 ) {
   return new MockLanguageModelV4({
@@ -44,7 +45,7 @@ function inputFor(
     answer: sample.body,
     today: "2026-11-07",
     mode: "mock",
-    modelId: "claude-opus-5",
+    modelId: "anthropic:claude-opus-5",
     ...extra,
   };
 }
@@ -54,6 +55,7 @@ const VALID = JSON.stringify({
   summary: "Coverage is low.",
   facts: {
     expiryDate: "2027-04-30",
+    expiryQuote: "expires 2027-04-30",
     coverageAmount: 1000000,
     holderName: "Tidewater Plumbing Inc.",
   },
@@ -144,5 +146,62 @@ describe("runTriage", () => {
     });
     const outcome = await runTriage(inputFor("cgl-complete", { model }));
     expect(!outcome.ok && outcome.error).toMatch(/AI call failed/);
+  });
+
+  it("fails closed when the call ends with an error or an unknown reason, even with valid JSON (R2)", async () => {
+    for (const reason of ["error", "other"] as const) {
+      const outcome = await runTriage(
+        inputFor("cgl-low-coverage", {
+          model: modelAnswering(VALID, reason, reason),
+        }),
+      );
+      expect(outcome.ok).toBe(false);
+      expect(!outcome.ok && outcome.error).toMatch(/stopped unexpectedly/);
+    }
+  });
+
+  it("caps an answer too long to send in full at partial (R3)", async () => {
+    // Neutral facts, so only the truncation rule can lower this result.
+    const complete = JSON.stringify({
+      ...JSON.parse(VALID),
+      completeness: "complete",
+      facts: {
+        expiryDate: null,
+        expiryQuote: null,
+        coverageAmount: null,
+        holderName: null,
+      },
+      flags: [],
+    });
+    const outcome = await runTriage(
+      inputFor("cgl-low-coverage", {
+        answer: `${"Details. ".repeat(2500)}The certificate expired last year.`,
+        model: modelAnswering(complete),
+      }),
+    );
+    expect(outcome.inputTruncated).toBe(true);
+    expect(outcome.ok && outcome.result.completeness).toBe("partial");
+    expect(outcome.ok && outcome.result.ruleNotes.join(" ")).toMatch(
+      /too long to read in full/,
+    );
+  });
+
+  it("turns a mistyped AI_MODEL into a failed run with a clear reason", async () => {
+    const outcome = await runTriage(
+      inputFor("cgl-complete", { mode: "live", modelId: "claude-sonnet-5" }),
+    );
+    expect(outcome.ok).toBe(false);
+    expect(!outcome.ok && outcome.error).toMatch(/provider:model/);
+  });
+});
+
+describe("liveModel", () => {
+  it("resolves any registered provider from one provider:model setting", () => {
+    expect(liveModel("openai:gpt-6-sol")).toMatchObject({
+      modelId: "gpt-6-sol",
+    });
+    expect(liveModel("anthropic:claude-sonnet-5")).toMatchObject({
+      modelId: "claude-sonnet-5",
+    });
   });
 });

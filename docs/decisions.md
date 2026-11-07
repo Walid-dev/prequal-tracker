@@ -4,9 +4,19 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
-- **2026-11-07 · Default model: Claude Sonnet 5.**
+- **2026-11-07 · One setting picks the model and the provider: `AI_MODEL=provider:model`.**
+  Why: the design doesn't depend on one vendor. The AI SDK provider registry resolves ids like `anthropic:claude-sonnet-5` or `openai:gpt-6-sol`, and each provider reads its own key. Adding a provider is one package and one line.
+
+- **2026-11-07 · All ten findings from the second model's review are fixed.**
+  Why: each one was reproduced and was real. The fixes tightened the rules (prompt `triage-v2`): an expiry date must be stated by its own quote, and safety warnings always survive the flag cap. A check now refuses a decision on a stale answer. See `docs/review/findings.md`.
+
+- **2026-11-07 · The design and the execution plan are HTML pages, in the same format as our kickoff docs.**
+  Why: diagrams whose boxes open the code, links pinned to a commit, and hover cards explain the system faster than prose. Markdown stays for the README, decisions, and process notes, which GitHub renders.
+
+- **2026-11-07 · Default model: Claude Sonnet 5 (`anthropic:claude-sonnet-5`).**
   Why: in the eval (`docs/eval/2026-11-07-report.md`), Sonnet 5 and Haiku 4.5 both passed all 16 runs, and 8 cases can't separate them. Sonnet 5 is the stronger model for messier real answers, at about $0.006 per triage and 3.1 s.
   Rejected: Opus 5 (14 of 16, stricter than the request on one case, about $0.017 per triage and 5.5 s). Haiku 4.5 stays a cheaper option through `AI_MODEL`.
+  Re-run on prompt `triage-v2` (`docs/eval/2026-11-07-triage-v2-report.md`): all three passed 16 of 16. Sonnet 5 stays the default. Opus 5 costs about three times as much per triage for the same result.
 
 - **2026-11-07 · The subcontractor's answer goes alone in the user message. Our rules and the request go in the system instructions.**
   Why: research (`docs/research/ai-triage.md`) shows role separation lowers injection success, but only partly. So it's one layer. Rules in code and the reviewer's decision are the others.
@@ -21,7 +31,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
   Why: the demo seed, the mock model, and the eval all need the same subcontractor answers. One file (`src/samples/answers.ts`) avoids three copies that drift apart. It holds inputs only. The expected results live with the eval, so they can be committed before the first live run.
 
 - **2026-11-07 · Independent review by a second AI model before sharing.**
-  Why: the model that wrote the code shouldn't be the only one that reviews it. A different model (Codex) reviews the finished repo, and each finding is fixed in its own commit or answered in writing.
+  Why: the model that wrote the code shouldn't be the only one that reviews it. A different model (Codex, GPT Sol 6.1 with extra high reasoning) reviews the finished repo against `docs/review/brief.md`. Each finding is fixed in its own commit or answered in writing.
 
 - **2026-11-07 · Build budget of 3 hours of active time, hard stop at 3.5 hours, stated in the README.**
   Why: the assignment tests scoping ("pick a small slice and do it well"). A working, tested slice answers that better than a polished product. The work can pause between gates. Only active time counts, and the README states the total.
@@ -30,7 +40,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 - **2026-11-07 · Vercel AI SDK 7 with the Anthropic provider.**
   Why: it matches the Next.js stack, ships mock models for tests, and switches provider in one line.
   Rejected: the official Anthropic SDK. It means one fewer layer, but we'd write our own mock, and it's less familiar to Next.js teams.
-  Risk: the AI SDK's API changed a lot between versions 4 and 7. Exact pins and the API notes in `CLAUDE.md` contain it.
+  Risk: the AI SDK's API changed a lot between versions 4 and 7. Exact pins and the API notes in `AGENTS.md` contain it.
 
 - **2026-11-07 · Mock fixtures include deliberate model mistakes.**
   Why: the stored mock answers for the eval cases include an expired date marked complete and a made-up quote. CI then proves the rules catch them, not only the happy path.
@@ -51,7 +61,7 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 - **2026-11-07 · Text responses only.**
   Why: text proves the triage logic. Uploads add storage, scanning, and size limits.
-  Next step: PDF uploads. Claude can read PDFs directly.
+  Next step: PDF uploads. Current models can read PDFs directly.
 
 - **2026-11-07 · No login. The reviewer types a name.**
   Next step: SSO, with reviewer and subcontractor roles.

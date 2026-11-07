@@ -72,12 +72,13 @@ export default async function RequestPage({
 
       <section className={CARD}>
         <h2 className="text-sm font-semibold text-slate-500">Review</h2>
-        {request.status === "responded" ? (
+        {request.status === "responded" && latestResponse ? (
           <div className="mt-3">
             <ReviewForm
               action={reviewAction.bind(null, request.id)}
               defaultReviewer={item.owner}
               suggestedNote={questions?.join("\n")}
+              responseId={latestResponse.id}
               triageRunId={latestRun?.id}
             />
           </div>

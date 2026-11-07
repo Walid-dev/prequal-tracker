@@ -17,8 +17,13 @@ describe("prequalification flow", () => {
     expect(listCases(db)[0]).toMatchObject({ total: 3, accepted: 0 });
 
     const first = getCase(db, caseId)?.requests[0].id ?? 0;
-    submitResponse(db, first, "WSIB clearance C-77 valid until 2027-06-30.");
+    const responseId = submitResponse(
+      db,
+      first,
+      "WSIB clearance C-77 valid until 2027-06-30.",
+    );
     reviewRequest(db, first, {
+      responseId,
       action: "accept",
       reviewer: "Sam Reviewer",
       note: "",

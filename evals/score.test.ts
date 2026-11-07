@@ -17,7 +17,7 @@ const info = {
   input: "",
   inputTruncated: false,
   mode: "live" as const,
-  model: "claude-haiku-4-5",
+  model: "anthropic:claude-haiku-4-5",
   promptVersion: "triage-v1",
   latencyMs: 4000,
   inputTokens: 1200,
@@ -39,7 +39,12 @@ function ok(
     result: {
       completeness,
       summary: "",
-      facts: { expiryDate: null, coverageAmount: null, holderName: null },
+      facts: {
+        expiryDate: null,
+        expiryQuote: null,
+        coverageAmount: null,
+        holderName: null,
+      },
       flags: codes.map((code) => ({ code: code as "expired", quote: "x" })),
       followUpQuestions: [],
       ruleNotes: notes,

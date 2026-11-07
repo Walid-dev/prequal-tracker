@@ -9,7 +9,7 @@ import { triageLatestAnswer, triageResultOf } from "./triage";
 
 const SETTINGS = {
   mode: "mock" as const,
-  modelId: "claude-opus-5",
+  modelId: "anthropic:claude-sonnet-5",
   today: "2026-11-07",
 };
 

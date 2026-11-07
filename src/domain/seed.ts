@@ -4,7 +4,7 @@ import type { Db } from "@/db/client";
 import { cases } from "@/db/schema";
 import { BRIGHTLINE, sampleAnswer, TIDEWATER } from "@/samples/answers";
 import { createCase, getCase } from "./cases";
-import { reviewRequest, submitResponse } from "./requests";
+import { getRequestDetail, reviewRequest, submitResponse } from "./requests";
 
 const OWNER = "Sam Reviewer";
 
@@ -33,6 +33,7 @@ export function seedDemoData(db: Db): boolean {
   );
   if (cor) {
     reviewRequest(db, cor.id, {
+      responseId: getRequestDetail(db, cor.id)?.latestResponse?.id ?? 0,
       action: "accept",
       reviewer: OWNER,
       note: "COR number and expiry date checked.",

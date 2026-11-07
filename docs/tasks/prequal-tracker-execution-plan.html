@@ -50,7 +50,8 @@
   code { font: 0.86em/1.4 var(--mono); background: var(--board-2); border: 1px solid var(--rule); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
   strong { color: #fff8e6; }
 
-  .layout { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+  /* Wide enough that diagrams and tables show at full size on large screens. Paragraphs keep their own 68ch limit. */
+  .layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
   .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; padding-top: 40px; font-size: 14.5px; }
   .toc .hand-label { font: 700 12px/1.2 var(--read); letter-spacing: 0.1em; text-transform: uppercase; color: var(--marker); margin: 0 0 12px; }
   .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -59,7 +60,7 @@
   .toc .sub { padding-left: 14px; font-size: 13.5px; }
   .toc-mobile { display: none; }
 
-  main { min-width: 0; max-width: 760px; }
+  main { min-width: 0; max-width: 1100px; }
   header.doc-head { padding-top: 40px; padding-bottom: 8px; }
   .eyebrow { font: 500 12.5px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--chalk-dim); margin: 0; }
   h1 { font: 700 clamp(30px, 4.6vw, 44px)/1.12 var(--read); margin: 12px 0 10px; text-wrap: balance; letter-spacing: -0.01em; }
@@ -282,12 +283,12 @@
     <header class="doc-head">
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
-      <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. The spec lives in <code>docs/PLAN.md</code>, and the decisions in <code>docs/decisions.md</code>.</p>
-      <p class="small muted">Status: gate 4 committed and merged into <code>main</code>. Gate 5, the independent review, is next.</p>
+      <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. The spec lives in <code>docs/PLAN.md</code>, the design in <code>docs/tasks/prequal-tracker-design.html</code>, and the decisions in <code>docs/decisions.md</code>.</p>
+      <p class="small muted">Status: all five gates done. The second model reviewed the repo and re-checked each round of fixes. All ten findings were fixed on <code>fix/review</code> and merged into <code>main</code> through pull request #1.</p>
       <ul class="chips">
-        <li class="chip">Now: <b>step 13</b></li>
+        <li class="chip">Now: <b>done, merged</b></li>
         <li class="chip">Commits: <b>12 of 12</b></li>
-        <li class="chip">Gates: <b>4 of 5</b></li>
+        <li class="chip">Gates: <b>5 of 5</b></li>
         <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
         <li class="chip">Build time: <b>about 1 h 45</b></li>
       </ul>
@@ -426,7 +427,7 @@
             <text x="814" y="196" class="t-sub">Codex · after gate 4</text>
             <a href="#step-13" aria-label="Step 13 Codex review">
               <rect x="808" y="208" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="821" cy="217.5" r="4.5" class="dot-ready"/>
+              <circle cx="821" cy="217.5" r="4.5" class="dot-done"/>
               <text x="832" y="222" class="t-link">Step 13<tspan class="t-cname"> Codex review</tspan></text>
             </a>
           </svg>
@@ -496,7 +497,7 @@
             <div class="t">Plan, decision log, and agent rules</div>
             <div class="who">I write · you check at gate 1</div>
             <p>The written plan the build follows, before any code: the spec with acceptance criteria and how the plan changed from v1 to v3, the decision log, the process log with the build clock started, the agent rules, and this page. No code yet.</p>
-            <p class="files">Files: README.md (stub) · CLAUDE.md · docs/PLAN.md · docs/decisions.md · docs/process.md · docs/tasks/prequal-tracker-execution-plan.html · .gitignore · .env.example</p>
+            <p class="files">Files: README.md (stub) · AGENTS.md · docs/PLAN.md · docs/decisions.md · docs/process.md · docs/tasks/prequal-tracker-execution-plan.html · .gitignore · .env.example</p>
             <p class="chk">Check: <code>git status --short</code> lists exactly those 8 files. A search for work names, local machine paths, and API key prefixes finds nothing, and there are no em dashes.</p>
             <p class="commit">docs(repo): add plan, decision log, and agent rules</p>
             <p class="chk"><strong>☑ Done.</strong> Committed on <code>main</code>.</p>
@@ -519,7 +520,7 @@
             <div class="t">Scaffold the app</div>
             <div class="who">I</div>
             <p>Generate Next.js 16.4.5 in a temporary folder and copy it in, so nothing we wrote is overwritten. Then pin every version exactly and add Vitest and tsx. Classic caching, no Cache Components. No features yet.</p>
-            <p class="files">Files: package.json · package-lock.json · tsconfig.json · next.config.ts · biome.json · vitest.config.mts · src/app/layout.tsx · src/app/page.tsx · src/app/globals.css · CLAUDE.md</p>
+            <p class="files">Files: package.json · package-lock.json · tsconfig.json · next.config.ts · biome.json · vitest.config.mts · src/app/layout.tsx · src/app/page.tsx · src/app/globals.css · AGENTS.md</p>
             <p class="chk">Check: <code>npm run lint</code>, <code>npm run typecheck</code>, <code>npm test</code>, and <code>npm run build</code> all pass, and the build renders the home page.</p>
             <p class="chk"><strong>☑ Done.</strong> Every version pinned exactly. No placeholder test: real tests start in step 3. The page check uses the build output.</p>
             <p class="commit">chore(repo): scaffold next.js app with typescript, tailwind, biome, and vitest</p>
@@ -593,7 +594,7 @@
           <div>
             <div class="t">The triage module</div>
             <div class="who">I</div>
-            <p>The AI feature as one self-contained folder. It builds the context, makes one Claude call through the AI SDK with a Zod schema, applies the rules (expired dates, quotes that must exist, an 8,000-character cap, can only lower), and reports tokens, cost, and time. It knows nothing about the database. Mock mode uses stored fixture answers, some with deliberate mistakes so the rules get exercised. A thin service saves each run and never touches request status.</p>
+            <p>The AI feature as one self-contained folder. It builds the context, makes one model call through the AI SDK with a Zod schema, applies the rules (expired dates, quotes that must exist, a cap at the form's 20,000-character limit, can only lower), and reports tokens, cost, and time. It knows nothing about the database. Mock mode uses stored fixture answers, some with deliberate mistakes so the rules get exercised. A thin service saves each run and never touches request status.</p>
             <p class="files">Files: src/ai/triage/schema.ts · prompt.ts · rules.ts · model.ts · fixtures.ts · triage.ts · rules.test.ts · triage.test.ts · src/domain/triage.ts · src/domain/triage.test.ts</p>
             <p class="chk">Check: tests prove that an expired date lowers the result to partial with an EXPIRED flag, a quote not in the answer is dropped, the rules never raise, schema failures and timeouts save a failed run, and triage leaves the request status unchanged. One live call with your key returns a valid result for under $0.02.</p>
             <p class="commit">feat(triage): add response triage module with structured output and rules</p>
@@ -683,15 +684,16 @@
         </li>
 
         <li class="phase" id="gate-5">Gate 5 · Independent review · after gate 4 · logged separately</li>
-        <li id="step-13" class="now">
+        <li id="step-13" class="done">
           <span class="num">13</span>
           <div>
             <div class="t">Review by a second model</div>
-            <div class="who">you run Codex (model to be named) · I prepare the brief and fix what you accept</div>
+            <div class="who">you run Codex (GPT Sol 6.1, extra high reasoning) · I prepare the brief and fix what you accept</div>
             <p>The model that wrote the code shouldn't be its only reviewer. I write a short review brief: what the repo does, where to look, and the rules it should hold to. You run it through Codex. Each finding you accept becomes its own <code>fix(...)</code> commit on <code>fix/review</code>. Each finding you reject gets one line in <code>docs/process.md</code> saying why.</p>
             <p class="files">Files: docs/review/brief.md · docs/review/findings.md · one fix commit per accepted finding</p>
             <p class="chk">Check: every finding is either fixed in a commit that names it or answered in <code>findings.md</code>, and lint, typecheck, tests, and the mock eval still pass after the fixes.</p>
             <p class="commit">docs(review): add the review brief and findings, then fix(...) per finding</p>
+            <p class="chk"><strong>☑ Done.</strong> Ten findings (1 high, 6 medium, 3 low), all reproduced and fixed. After the fixes, the live eval re-ran on prompt <code>triage-v2</code>: all three models passed 16 of 16, for $0.41. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 51 tests and the mock eval pass.</p>
           </div>
         </li>
         <li class="gate">
@@ -699,7 +701,7 @@
           <div>
             <div class="t">GO 5: you read the findings and the fixes</div>
             <div class="who">you</div>
-            <p>On GO, I merge <code>fix/review</code> into <code>main</code>. The repo is then ready for you to push.</p>
+            <p>The pull request from <code>fix/review</code> into <code>main</code> carries the review, the fixes, and the design page. CI runs on it.</p>
           </div>
         </li>
       </ol>
@@ -721,7 +723,7 @@
       <h2>After the build</h2>
       <p>These are outside the build clock and not part of the submission's code.</p>
       <ul>
-        <li><strong>Share (you).</strong> I run the leak search one last time and give you the exact commands. You create the repo on your GitHub account, push, and either make it public or give the reviewer access. Check: CI turns green on GitHub.</li>
+        <li><strong>Share (you).</strong> ☑ Pushed to a private GitHub repository. After the review, make it public or give the reviewer access. Check: CI turns green on GitHub.</li>
         <li><strong>Private prep (I).</strong> The HTML explainer with diagrams, and the interview questions with answers built on the real eval numbers. Private artifacts, never in the repo.</li>
       </ul>
     </section>
@@ -733,17 +735,19 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+        <li><span class="when">Review</span><span>Codex (GPT Sol 6.1) reviewed the whole repo against the brief. It re-checked each round of fixes. All ten findings were fixed on <code>fix/review</code>, and one setting now picks the model and the provider.</span></li>
+        <li><span class="when">Shared</span><span>Pushed to a private GitHub repository. Added the design page, <code>docs/tasks/prequal-tracker-design.html</code>, in the same format as this page, and the review brief, <code>docs/review/brief.md</code>.</span></li>
         <li><span class="when">Gate 4</span><span>Eval (8 of 8 in mock mode, three models live), CI, README, and process notes committed and merged into <code>main</code>.</span></li>
         <li><span class="when">Gate 3</span><span>AI module committed and merged into <code>main</code>: the triage module with its research-backed guards, and the triage panel. 34 tests and 10 browser checks pass.</span></li>
         <li><span class="when">Research</span><span>A verified multi-agent research pass on AI triage confirmed the one-call design and changed five details before gate 3.</span></li>
         <li><span class="when">Gate 2</span><span>Core app committed and merged into <code>main</code>: app setup, database, Docker, cases, responses, and reviews. 17 tests and 9 browser checks pass.</span></li>
       </ol>
-      <p>Next action: gate 5, the review brief for the second model.</p>
+      <p>Done: pull request #1 is merged into <code>main</code>, with CI green.</p>
     </section>
   </main>
 </div>
 <!-- hovercard:start -->
-<script type="application/json" id="link-tips">{"https://www.conventionalcommits.org/en/v1.0.0/":{"t":"Conventional Commits 1.0.0","s":"","d":"The commit message format used for every commit here: type(scope): summary, for example feat(triage): add the triage module."},"https://nextjs.org/docs/app/api-reference/cli/create-next-app":{"t":"create-next-app","s":"Next.js docs","d":"The official generator for a new Next.js app. Step 2 runs it with TypeScript, Tailwind, the App Router, a src folder, and Biome."},"https://nextjs.org/docs/app/guides/upgrading/version-16":{"t":"Upgrading to Next.js 16","s":"Next.js docs","d":"What changed in version 16, such as async params, Turbopack by default, and middleware renamed to proxy. The agent rules in CLAUDE.md follow it."},"https://biomejs.dev/guides/getting-started/":{"t":"Biome","s":"","d":"One tool that formats the code and flags likely mistakes. It runs as npm run lint, locally and in CI."},"https://vitest.dev/guide/":{"t":"Vitest","s":"","d":"The test runner for our unit tests and the end-to-end flow test. It runs as npm test."},"https://orm.drizzle.team/docs/get-started-sqlite":{"t":"Drizzle with SQLite","s":"Drizzle docs","d":"How Drizzle connects to a SQLite file through better-sqlite3. Our five tables are defined this way in one schema file."},"https://orm.drizzle.team/docs/migrations":{"t":"Drizzle migrations","s":"Drizzle docs","d":"How schema changes become numbered SQL files in git, applied in order. This is the database versioning part of the build."},"https://nextjs.org/docs/app/guides/instrumentation":{"t":"Next.js instrumentation","s":"Next.js docs","d":"A hook that runs once when the server starts. We use it to apply database migrations before the first request."},"https://nextjs.org/docs/app/api-reference/config/next-config-js/output":{"t":"Standalone output","s":"Next.js docs","d":"A build mode that bundles only the server and the files it uses, which keeps the Docker image small."},"https://docs.docker.com/compose/":{"t":"Docker Compose","s":"Docker docs","d":"Runs the app container from one file, with its port, settings, and the named volume that keeps the database between restarts."},"https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction":{"t":"WSIB clearance in construction","s":"Ontario policy","d":"WSIB policy that requires a hiring contractor in construction to get a clearance certificate for each contractor it hires directly. It is the first item on every checklist."},"https://www.ihsa.ca/COR/COR-FAQs.aspx":{"t":"COR, Certificate of Recognition","s":"IHSA","d":"IHSA's certification of a company's health and safety program, often required on Ontario construction projects. A checklist item for every trade."},"https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/":{"t":"ESA electrical contractor licence","s":"Electrical Safety Authority","d":"Ontario's licence for electrical contractors, shown as a 7-digit number on contracts. The extra checklist item for electrical subcontractors."},"https://nextjs.org/docs/app/getting-started/mutating-data":{"t":"Server Actions","s":"Next.js docs","d":"Functions that run on the server when a form is submitted. Every write in the app goes through one: create a case, respond, review, run triage."},"https://react.dev/reference/react/useActionState":{"t":"useActionState","s":"React docs","d":"The React hook our forms use to show a pending state and the errors a server action returns."},"https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data":{"t":"AI SDK structured output","s":"AI SDK docs","d":"How generateText with an output schema returns JSON checked against a Zod schema. The triage result comes back this way."},"https://ai-sdk.dev/docs/ai-sdk-core/testing":{"t":"AI SDK testing","s":"AI SDK docs","d":"The SDK's mock language models for tests. Our fixture mock is built on MockLanguageModelV4, so tests and CI never call the real API."},"https://ai-sdk.dev/providers/ai-sdk-providers/anthropic":{"t":"AI SDK Anthropic provider","s":"AI SDK docs","d":"The adapter that connects the AI SDK to Claude models. It reads the API key from ANTHROPIC_API_KEY."},"https://www.anthropic.com/engineering/building-effective-agents":{"t":"Building effective agents","s":"Anthropic engineering","d":"Anthropic's guidance to use simple workflows when the steps are predictable and agents only when they are not. It backs the one-call design."},"https://docs.anthropic.com/en/docs/about-claude/pricing":{"t":"Claude pricing","s":"Anthropic docs","d":"Per-token prices for each Claude model. The eval quote and the cost shown on each triage run use these numbers."},"https://docs.github.com/en/actions":{"t":"GitHub Actions","s":"GitHub docs","d":"GitHub's CI service. Our workflow runs lint, typecheck, tests, the mock eval, and the build on every push."}}</script>
+<script type="application/json" id="link-tips">{"https://www.conventionalcommits.org/en/v1.0.0/":{"t":"Conventional Commits 1.0.0","s":"","d":"The commit message format used for every commit here: type(scope): summary, for example feat(triage): add the triage module."},"https://nextjs.org/docs/app/api-reference/cli/create-next-app":{"t":"create-next-app","s":"Next.js docs","d":"The official generator for a new Next.js app. Step 2 runs it with TypeScript, Tailwind, the App Router, a src folder, and Biome."},"https://nextjs.org/docs/app/guides/upgrading/version-16":{"t":"Upgrading to Next.js 16","s":"Next.js docs","d":"What changed in version 16, such as async params, Turbopack by default, and middleware renamed to proxy. The agent rules in AGENTS.md follow it."},"https://biomejs.dev/guides/getting-started/":{"t":"Biome","s":"","d":"One tool that formats the code and flags likely mistakes. It runs as npm run lint, locally and in CI."},"https://vitest.dev/guide/":{"t":"Vitest","s":"","d":"The test runner for our unit tests and the end-to-end flow test. It runs as npm test."},"https://orm.drizzle.team/docs/get-started-sqlite":{"t":"Drizzle with SQLite","s":"Drizzle docs","d":"How Drizzle connects to a SQLite file through better-sqlite3. Our five tables are defined this way in one schema file."},"https://orm.drizzle.team/docs/migrations":{"t":"Drizzle migrations","s":"Drizzle docs","d":"How schema changes become numbered SQL files in git, applied in order. This is the database versioning part of the build."},"https://nextjs.org/docs/app/guides/instrumentation":{"t":"Next.js instrumentation","s":"Next.js docs","d":"A hook that runs once when the server starts. We use it to apply database migrations before the first request."},"https://nextjs.org/docs/app/api-reference/config/next-config-js/output":{"t":"Standalone output","s":"Next.js docs","d":"A build mode that bundles only the server and the files it uses, which keeps the Docker image small."},"https://docs.docker.com/compose/":{"t":"Docker Compose","s":"Docker docs","d":"Runs the app container from one file, with its port, settings, and the named volume that keeps the database between restarts."},"https://www.wsib.ca/en/operational-policy-manual/clearance-certificate-construction":{"t":"WSIB clearance in construction","s":"Ontario policy","d":"WSIB policy that requires a hiring contractor in construction to get a clearance certificate for each contractor it hires directly. It is the first item on every checklist."},"https://www.ihsa.ca/COR/COR-FAQs.aspx":{"t":"COR, Certificate of Recognition","s":"IHSA","d":"IHSA's certification of a company's health and safety program, often required on Ontario construction projects. A checklist item for every trade."},"https://esasafe.com/contractors/licensed-electrical-contractor/get-your-licence/":{"t":"ESA electrical contractor licence","s":"Electrical Safety Authority","d":"Ontario's licence for electrical contractors, shown as a 7-digit number on contracts. The extra checklist item for electrical subcontractors."},"https://nextjs.org/docs/app/getting-started/mutating-data":{"t":"Server Actions","s":"Next.js docs","d":"Functions that run on the server when a form is submitted. Every write in the app goes through one: create a case, respond, review, run triage."},"https://react.dev/reference/react/useActionState":{"t":"useActionState","s":"React docs","d":"The React hook our forms use to show a pending state and the errors a server action returns."},"https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data":{"t":"AI SDK structured output","s":"AI SDK docs","d":"How generateText with an output schema returns JSON checked against a Zod schema. The triage result comes back this way."},"https://ai-sdk.dev/docs/ai-sdk-core/testing":{"t":"AI SDK testing","s":"AI SDK docs","d":"The SDK's mock language models for tests. Our fixture mock is built on MockLanguageModelV4, so tests and CI never call the real API."},"https://ai-sdk.dev/providers/ai-sdk-providers/anthropic":{"t":"AI SDK Anthropic provider","s":"AI SDK docs","d":"The adapter that connects the AI SDK to Claude models. It reads the API key from ANTHROPIC_API_KEY."},"https://www.anthropic.com/engineering/building-effective-agents":{"t":"Building effective agents","s":"Anthropic engineering","d":"Anthropic's guidance to use simple workflows when the steps are predictable and agents only when they are not. It backs the one-call design."},"https://docs.anthropic.com/en/docs/about-claude/pricing":{"t":"Claude pricing","s":"Anthropic docs","d":"Per-token prices for each Claude model. The eval quote and the cost shown on each triage run use these numbers."},"https://docs.github.com/en/actions":{"t":"GitHub Actions","s":"GitHub docs","d":"GitHub's CI service. Our workflow runs lint, typecheck, tests, the mock eval, and the build on every push."}}</script>
 <div id="hovercard" class="hovercard" role="tooltip" hidden></div>
 <script>
 /* Hover cards: show the description from #link-tips when a link is hovered or focused. */

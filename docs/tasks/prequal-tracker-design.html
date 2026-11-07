@@ -1,0 +1,786 @@
+<title>Prequal Tracker Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --board: #151b26;
+    --board-2: #1c2433;
+    --board-3: #243047;
+    --rule: #2d3a52;
+    --chalk: #e9e5d8;
+    --chalk-dim: #a9b1c2;
+    --marker: #f4c95d;
+    --mint: #8fd3b6;
+    --coral: #f2917e;
+    --sky: #9cc3ff;
+    --wire: #8f98aa;
+    --ink-hi: #f4f1ea;
+    --ink-sub: #c4c8d2;
+    --amber: #f0c35a;
+    --amber-fill: #3a3019;
+    --violet: #b8a2f2;
+    --violet-fill: #2a2240;
+    --blue: #8ab4f8;
+    --blue-fill: #1b2a44;
+    --green: #90d18c;
+    --green-fill: #1f3421;
+    --teal: #74d2b0;
+    --teal-fill: #1b342c;
+    --coral-fill: #3b221f;
+    --slate: #b9bfcc;
+    --slate-fill: #1b212d;
+    --read: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--board); }
+  body {
+    margin: 0;
+    background: var(--board);
+    color: var(--chalk);
+    font: 17px/1.68 var(--read);
+    padding-inline: 16px;
+    padding-block: 0 64px;
+  }
+  a { color: var(--sky); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--chalk); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--marker); outline-offset: 3px; border-radius: 3px; }
+  code { font: 0.86em/1.4 var(--mono); background: var(--board-2); border: 1px solid var(--rule); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  strong { color: #fff8e6; }
+
+  /* Wide enough that diagrams and tables show at full size on large screens. Paragraphs keep their own 68ch limit. */
+  .layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; padding-top: 40px; font-size: 14.5px; }
+  .toc .hand-label { font: 700 12px/1.2 var(--read); letter-spacing: 0.1em; text-transform: uppercase; color: var(--marker); margin: 0 0 12px; }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .toc a { color: var(--chalk-dim); text-decoration: none; }
+  .toc a:hover { color: var(--chalk); text-decoration: underline; }
+  .toc .sub { padding-left: 14px; font-size: 13.5px; }
+  .toc-mobile { display: none; }
+
+  main { min-width: 0; max-width: 1100px; }
+  header.doc-head { padding-top: 40px; padding-bottom: 8px; }
+  .eyebrow { font: 500 12.5px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--chalk-dim); margin: 0; }
+  h1 { font: 700 clamp(30px, 4.6vw, 44px)/1.12 var(--read); margin: 12px 0 10px; text-wrap: balance; letter-spacing: -0.01em; }
+  h1 .scribble { color: var(--marker); }
+  .lede { color: var(--chalk-dim); margin: 0 0 22px; max-width: 64ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; padding: 0; list-style: none; }
+  .chip { font-size: 13.5px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--rule); background: var(--board-2); color: var(--chalk); }
+  .chip b { color: var(--marker); font-weight: 700; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0 0 12px; }
+  .stat { border: 1px dashed var(--rule); border-radius: 10px; padding: 14px 16px; background: var(--board-2); }
+  .stat .num { white-space: nowrap; font: 700 22px/1.2 var(--read); font-variant-numeric: tabular-nums; color: #fff8e6; }
+  .stat .num .arrow { color: var(--marker); padding-inline: 4px; }
+  .stat .lbl { font-size: 14px; color: var(--chalk-dim); margin-top: 4px; line-height: 1.4; }
+
+  section { padding-top: 44px; }
+  h2 { font: 700 26px/1.25 var(--read); margin: 0 0 6px; text-wrap: balance; display: flex; align-items: baseline; gap: 12px; }
+  h2 .tag { font: 700 11.5px/1 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); border: 1px solid rgba(240, 195, 90, 0.5); border-radius: 999px; padding: 5px 9px; align-self: center; }
+  h3 { font: 700 19.5px/1.35 var(--read); margin: 30px 0 4px; text-wrap: balance; }
+  h3 .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink-hi); color: var(--board); font: 700 14px/1 var(--read); margin-right: 10px; vertical-align: 2px; }
+  p, li { max-width: 68ch; }
+  p { margin: 12px 0; }
+  ul, ol { padding-left: 22px; margin: 12px 0; }
+  li { margin: 6px 0; }
+  li::marker { color: var(--chalk-dim); }
+  .muted { color: var(--chalk-dim); }
+  .small { font-size: 14.5px; }
+  hr.chalk { border: 0; height: 2px; margin: 44px 0 0; background: repeating-linear-gradient(90deg, var(--rule) 0 14px, transparent 14px 22px); }
+
+  .verdict { border: 2px dashed var(--marker); border-radius: 14px 18px 12px 16px; padding: 16px 20px; margin: 20px 0; background: rgba(244, 201, 93, 0.06); }
+  .verdict .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); margin: 0 0 6px; }
+  .verdict p { margin: 6px 0; }
+  .aside { border-left: 0; padding: 12px 16px; margin: 18px 0; background: var(--board-2); border-radius: 10px; border: 1px solid var(--rule); font-size: 15.5px; }
+  .aside .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); margin: 0 0 6px; }
+
+  figure { margin: 22px 0 8px; }
+  .sketch { overflow-x: auto; border: 1px solid var(--rule); border-radius: 14px; background: radial-gradient(1200px 400px at 20% 0%, #1b2332 0%, var(--board-2) 60%); padding: 10px; }
+  .sketch svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  .sketch svg text { font-family: var(--read); }
+  figcaption { font-size: 14.5px; color: var(--chalk-dim); margin-top: 8px; max-width: 68ch; }
+
+  .tbl { overflow-x: auto; margin: 16px 0; border: 1px solid var(--rule); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.5; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  th { font: 700 12px/1.3 var(--read); text-transform: uppercase; letter-spacing: 0.07em; color: var(--chalk-dim); background: var(--board-2); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.hl { color: var(--marker); font-weight: 700; }
+  .sev { display: inline-block; font: 700 11.5px/1 var(--read); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+  .sev.high { color: #2a1712; background: var(--coral); }
+  .sev.med { color: #2b220a; background: var(--marker); }
+  .sev.low { color: #0e2219; background: var(--mint); }
+  .pill-go { color: var(--mint); font-weight: 700; }
+  .pill-no { color: var(--coral); font-weight: 700; }
+
+  .timeline { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 0; }
+  .timeline li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 16px; margin: 0; padding: 10px 0; border-top: 1px dashed var(--rule); max-width: none; }
+  .timeline li:first-child { border-top: 0; }
+  .timeline .when { font: 700 15px/1.5 var(--read); color: var(--marker); }
+
+  .stories { list-style: none; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+  .stories li { border: 1px solid var(--rule); background: var(--board-2); border-radius: 12px; padding: 14px 16px; margin: 0; max-width: none; }
+  .stories .t { font-weight: 700; color: #fff8e6; }
+  .stories .meta { font: 500 12.5px/1.4 var(--mono); color: var(--marker); margin-top: 2px; }
+  .stories p { margin: 6px 0 0; font-size: 15.5px; }
+
+  .decisions { list-style: none; padding: 0; display: grid; gap: 10px; }
+  .decisions li { margin: 0; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--rule); background: var(--board-2); max-width: none; }
+  .decisions .state { display: inline-block; font: 700 11.5px/1 var(--read); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; border: 1px solid currentColor; margin-right: 10px; vertical-align: 2px; }
+  .decisions .agreed .state { color: var(--mint); }
+  .decisions .open .state { color: var(--marker); }
+
+  .draft { border: 1px dashed var(--chalk-dim); border-radius: 12px; background: #121823; margin: 16px 0; }
+  .draft-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px dashed var(--rule); flex-wrap: wrap; }
+  .draft-head .hand-label { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); margin: 0; }
+  .draft-body { padding: 4px 16px 12px; font-size: 15.5px; }
+  .draft-body p, .draft-body li { max-width: 72ch; }
+  button.copy { font: 600 13px/1 var(--read); color: var(--board); background: var(--marker); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  button.copy:hover { background: #ffd978; }
+
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .toc { display: none; }
+    .toc-mobile { display: block; margin: 0 0 8px; border: 1px solid var(--rule); border-radius: 10px; background: var(--board-2); padding: 10px 14px; }
+    .toc-mobile summary { font: 700 12.5px/1.2 var(--read); letter-spacing: 0.1em; text-transform: uppercase; color: var(--marker); cursor: pointer; }
+    .toc-mobile ol { margin: 10px 0 4px; padding-left: 20px; font-size: 15px; }
+    main { max-width: none; }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 16.5px; }
+    .stats { grid-template-columns: minmax(0, 1fr); }
+    .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+
+  /* diagrams: solid tinted boxes; colour carries meaning (amber client, violet our servers, blue proxy/CDN/cache, green in use or good, teal the fix, red the problem, grey neutral) */
+  .box { stroke-width: 2.5; }
+  .c-amber { stroke: var(--amber); fill: var(--amber-fill); }
+  .c-violet { stroke: var(--violet); fill: var(--violet-fill); }
+  .c-blue { stroke: var(--blue); fill: var(--blue-fill); }
+  .c-green { stroke: var(--green); fill: var(--green-fill); }
+  .c-teal { stroke: var(--teal); fill: var(--teal-fill); }
+  .c-coral { stroke: var(--coral); fill: var(--coral-fill); }
+  .c-ghost { stroke: var(--slate); fill: var(--slate-fill); }
+  .t-title { font-size: 15px; font-weight: 700; fill: var(--ink-hi); }
+  .t-sub { font-size: 13px; fill: var(--ink-sub); }
+  .t-copy { font-size: 13.5px; font-weight: 600; fill: var(--slate); }
+  .t-label { font-size: 14px; font-weight: 700; fill: var(--ink-hi); }
+  .t-val { font-size: 14px; font-weight: 700; fill: var(--ink-hi); font-variant-numeric: tabular-nums; }
+  .t-note { font-size: 13px; fill: var(--chalk-dim); }
+  .t-link { font-size: 13px; font-weight: 700; fill: var(--sky); }
+  .t-sky { fill: var(--sky); }
+  .t-sep { fill: var(--chalk-dim); font-weight: 400; }
+  .sketch a { cursor: pointer; }
+  .sketch a:hover tspan, .sketch a:hover .t-link { text-decoration: underline; }
+  .sketch a:hover > .box { stroke-width: 3.5; }
+  .sketch a:focus-visible { outline: 2px solid var(--marker); outline-offset: 2px; }
+  .t-cname { font-weight: 400; fill: var(--ink-sub); }
+  .hit { fill: transparent; }
+  .sketch a:hover .hit { fill: rgba(156, 195, 255, 0.1); }
+  .dot-done { fill: var(--green); }
+  .dot-prog { fill: var(--amber); }
+  .dot-ready { fill: var(--blue); }
+  .dot-hold { fill: var(--slate); }
+  .dot-other { fill: none; stroke: var(--violet); stroke-width: 1.6; }
+  .dot-draft { fill: none; stroke: var(--slate); stroke-width: 1.6; stroke-dasharray: 2 2; }
+  .t-group { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+  .t-strong { font-weight: 700; }
+  .t-hot { fill: var(--coral); }
+  .t-good { fill: var(--green); }
+  .t-teal { fill: var(--teal); }
+  .t-amber { fill: var(--amber); }
+  .t-violet { fill: var(--violet); }
+  .t-blue { fill: var(--blue); }
+  .wire { stroke: var(--wire); stroke-width: 2; fill: none; stroke-linejoin: round; }
+  .wire.hot { stroke: var(--coral); stroke-width: 3; }
+  .wire.good { stroke: var(--green); }
+  .wire.dash { stroke-dasharray: 6 6; }
+  .head { fill: var(--wire); }
+  .head.hot { fill: var(--coral); }
+  .head.good { fill: var(--green); }
+  .badge { fill: var(--ink-hi); }
+  .badge-n { font-size: 14px; font-weight: 700; fill: #151b26; }
+  .zone { fill: none; stroke: var(--slate); stroke-width: 1.5; stroke-dasharray: 5 6; opacity: 0.6; }
+  .rule-violet { stroke: var(--violet); stroke-width: 1.5; opacity: 0.6; }
+  .cross { stroke: var(--teal); stroke-width: 4; stroke-linecap: round; fill: none; }
+  .bar-today { fill: #343c50; stroke: var(--slate); stroke-width: 1.5; }
+  .bar-new { fill: var(--green-fill); stroke: var(--green); stroke-width: 2; }
+
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  html { scroll-behavior: smooth; }
+  /* plan page: workstream lanes with card chips coloured by status */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 14px 0 6px; padding: 0; list-style: none; font-size: 13.5px; color: var(--chalk-dim); }
+  .legend li { display: flex; align-items: center; gap: 6px; margin: 0; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; display: inline-block; }
+  .lanes { display: grid; gap: 14px; margin: 18px 0; }
+  .lane { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; background: var(--board-2); }
+  .lane-name { font: 700 12px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--chalk-dim); margin: 0 0 10px; }
+  .row { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .row + .row { margin-top: 10px; }
+  .rowlab { margin: 0; padding-top: 9px; font: 600 13px/1.35 var(--read); color: var(--chalk-dim); max-width: none; }
+  .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  @media (max-width: 560px) { .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } .rowlab { padding-top: 0; } }
+  .card { min-width: 0; flex: 0 1 196px; border: 2px solid; border-radius: 10px; padding: 8px 10px; font-size: 14px; line-height: 1.35; }
+  .card a { font-weight: 700; text-decoration: none; }
+  .card a:hover { text-decoration: underline; }
+  .card .what { display: block; color: var(--ink-hi); }
+  .card .own { font-weight: 700; color: var(--violet); }
+  .card .st { display: block; font-size: 12.5px; color: var(--ink-sub); margin-top: 3px; }
+  .st-done { border-color: var(--green); background: var(--green-fill); }
+  .st-prog { border-color: var(--amber); background: var(--amber-fill); }
+  .st-ready { border-color: var(--blue); background: var(--blue-fill); }
+  .st-hold { border-color: var(--slate); background: var(--slate-fill); }
+  .st-other { border-color: var(--violet); background: var(--violet-fill); }
+  .st-draft { border-style: dashed; }
+  .steps { list-style: none; padding: 0; display: grid; gap: 10px; counter-reset: none; }
+  .steps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; margin: 0; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--board-2); max-width: none; }
+  .steps .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink-hi); color: var(--board); font: 700 14px/1 var(--read); }
+  .steps .t { font-weight: 700; color: var(--ink-hi); }
+  .steps .who { font: 500 12.5px/1.4 var(--mono); color: var(--marker); margin-top: 2px; }
+  .steps p { margin: 4px 0 0; font-size: 15.5px; }
+  .steps .chk { font-size: 14px; color: var(--ink-sub); }
+  .steps .prod { font-size: 13.5px; color: var(--chalk-dim); }
+  .steps li.now { border-color: var(--marker); }
+  /* plan page extras for this build: step details, gate rows, budget bars */
+  .steps .files { font: 13px/1.55 var(--mono); color: var(--chalk-dim); overflow-wrap: anywhere; }
+  .steps .commit { font: 500 13px/1.4 var(--mono); color: var(--mint); overflow-wrap: anywhere; }
+  .steps .ref { font-size: 14px; color: var(--chalk-dim); }
+  .steps li.gate { grid-template-columns: 34px minmax(0, 1fr); border-style: dashed; border-color: var(--marker); background: rgba(244, 201, 93, 0.05); }
+  .steps li.gate .num { background: var(--marker); }
+  .steps li.done .num { background: var(--green); }
+  .steps li.phase { display: block; border: 0; background: none; padding: 18px 2px 0; font: 700 12px/1.2 var(--read); letter-spacing: 0.08em; text-transform: uppercase; color: var(--marker); }
+  /* hovercard:start */
+  /* hover cards: a short plain description of the card, MR, commit or file a link points to */
+  .hovercard { position: fixed; z-index: 50; width: max-content; max-width: min(340px, calc(100vw - 16px)); padding: 10px 12px 11px; border-radius: 10px; background: var(--board-3); border: 1px solid var(--rule); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45); color: var(--chalk); font: 14px/1.45 var(--read); pointer-events: none; }
+  .hovercard .hc-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-weight: 700; color: var(--ink-hi); }
+  .hovercard .hc-status { font: 700 10.5px/1 var(--read); letter-spacing: 0.07em; text-transform: uppercase; color: var(--marker); border: 1px solid rgba(240, 195, 90, 0.5); border-radius: 999px; padding: 3px 7px; }
+  .hovercard p { margin: 5px 0 0; max-width: none; }
+  /* hovercard:end */
+</style>
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <p class="hand-label">contents</p>
+    <ol>
+      <li><a href="#plain">In plain language</a></li>
+      <li><a href="#glance">At a glance</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#lifecycle">A request's life</a></li>
+      <li><a href="#ai">The AI feature</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#files">Key files</a></li>
+      <li><a href="#decisions">Decisions</a></li>
+      <li><a href="#eval">Evaluation</a></li>
+      <li><a href="#tests">Tests and checks</a></li>
+      <li><a href="#risks">Edge cases and risks</a></li>
+      <li><a href="#ops">Operations and rollback</a></li>
+      <li><a href="#scope">Out of scope</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-head">
+      <p class="eyebrow">Design · feature · written 2026-11-07</p>
+      <h1>Prequal Tracker <span class="scribble">design</span></h1>
+      <p class="lede">A subcontractor prequalification tracker with AI response triage. This page explains what was built and why. The step-by-step build, with the outcome of each commit, is the companion page <code>docs/tasks/prequal-tracker-execution-plan.html</code>.</p>
+      <p class="small muted">Status: finished. Built, tested, evaluated, reviewed by a second AI model, and merged into <code>main</code>. All ten review findings are fixed.</p>
+      <ul class="chips">
+        <li class="chip">Next.js <b>16.4</b></li>
+        <li class="chip">Model: <b>any provider</b>, default Claude Sonnet 5</li>
+        <li class="chip">SQLite + <b>Drizzle</b></li>
+        <li class="chip">Tests: <b>51</b></li>
+        <li class="chip">Eval: <b>16 of 16</b> on every model</li>
+      </ul>
+    </header>
+
+    <details class="toc-mobile">
+      <summary>Contents</summary>
+      <ol>
+        <li><a href="#plain">In plain language</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#ai">The AI feature</a></li>
+        <li><a href="#eval">Evaluation</a></li>
+        <li><a href="#glossary">Glossary</a></li>
+      </ol>
+    </details>
+
+    <section id="plain">
+      <h2>In plain language</h2>
+      <p>A general contractor in Ontario can't let a subcontractor on site until the paperwork is in order. Someone collects the same documents from every electrician, plumber, and HVAC company: a WSIB clearance, a liability insurance certificate, a safety certificate, and for electricians a licence number. They read every answer, and they send it back when something is missing or expired. It's slow, repetitive reading, and a missed expiry date is a real liability.</p>
+      <p>The tracker turns that into a checklist per subcontractor. Each answer gets an AI triage: a short note that says whether the answer is complete, partial, or insufficient, quotes the exact words behind each problem, and drafts the questions to send back. Hard rules in code check the note before anyone sees it. The reviewer always makes the decision. The AI never accepts anything.</p>
+      <div class="verdict">
+        <p class="hand-label">the one-line version</p>
+        <p>The AI reads, the rules check, the human decides, and every step is saved.</p>
+      </div>
+    </section>
+
+    <section id="glance">
+      <h2>At a glance</h2>
+      <ul>
+        <li><strong>Type:</strong> new feature, a small full-stack app. Build time: about 1 h 45, in four reviewed gates.</li>
+        <li><strong>Problem:</strong> reviewers read every subcontractor answer by hand against the request it answers.</li>
+        <li><strong>Approach:</strong> a request tracker with one structured AI call per answer, rules in code after the model, and a human decision on every request.</li>
+        <li><strong>Risk:</strong> medium. The primary risk is a wrong AI note that a reviewer trusts. Guards: closed lists, quotes that must exist, rules that only make results stricter, and the human decision.</li>
+        <li><strong>Runs with:</strong> <code>docker compose up --build</code>. Mock mode by default, so no API key is needed.</li>
+      </ul>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <p>One Next.js server holds the pages, the server actions, and the domain code. The database is a single SQLite file. Only the AI module talks to the outside world, and in mock mode it doesn't.</p>
+      <figure>
+        <div class="sketch">
+          <svg viewBox="0 0 730 370" role="img" aria-label="The browser talks to Next.js pages and server actions. They call the domain code, which reads and writes SQLite, and the triage service, which calls the AI module once per answer and saves each run. The AI module calls the model in live mode, or uses stored answers in mock mode.">
+            <defs>
+              <marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+            </defs>
+            <rect x="20" y="30" width="130" height="72" rx="12" class="box c-amber"/>
+            <text x="85" y="62" text-anchor="middle" class="t-title">Reviewer</text>
+            <text x="85" y="82" text-anchor="middle" class="t-sub">browser</text>
+            <path d="M150,66 H186" class="wire" marker-end="url(#m1)"/>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app" target="_blank" rel="noopener noreferrer" aria-label="src/app: pages and server actions">
+              <rect x="190" y="30" width="170" height="72" rx="12" class="box c-violet"/>
+              <text x="275" y="56" text-anchor="middle" class="t-title">Pages + actions</text>
+              <text x="275" y="75" text-anchor="middle" class="t-sub">forms post here</text>
+              <text x="275" y="93" text-anchor="middle" class="t-link">src/app</text>
+            </a>
+            <path d="M360,66 H396" class="wire" marker-end="url(#m1)"/>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain" target="_blank" rel="noopener noreferrer" aria-label="src/domain: cases, requests, reviews">
+              <rect x="400" y="30" width="150" height="72" rx="12" class="box c-violet"/>
+              <text x="475" y="56" text-anchor="middle" class="t-title">Domain</text>
+              <text x="475" y="75" text-anchor="middle" class="t-sub">rules, status</text>
+              <text x="475" y="93" text-anchor="middle" class="t-link">src/domain</text>
+            </a>
+            <path d="M550,66 H586" class="wire" marker-end="url(#m1)"/>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/db/schema.ts" target="_blank" rel="noopener noreferrer" aria-label="src/db/schema.ts: the five tables">
+              <rect x="590" y="30" width="120" height="72" rx="12" class="box c-blue"/>
+              <text x="650" y="56" text-anchor="middle" class="t-title">SQLite</text>
+              <text x="650" y="75" text-anchor="middle" class="t-sub">5 tables</text>
+              <text x="650" y="93" text-anchor="middle" class="t-link">schema.ts</text>
+            </a>
+
+            <path d="M275,102 V166" class="wire" marker-end="url(#m1)"/>
+            <text x="283" y="140" class="t-note">Run AI triage</text>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/triage.ts" target="_blank" rel="noopener noreferrer" aria-label="src/domain/triage.ts: the triage service">
+              <rect x="190" y="170" width="170" height="72" rx="12" class="box c-violet"/>
+              <text x="275" y="196" text-anchor="middle" class="t-title">Triage service</text>
+              <text x="275" y="215" text-anchor="middle" class="t-sub">saves each run</text>
+              <text x="275" y="233" text-anchor="middle" class="t-link">domain/triage.ts</text>
+            </a>
+            <path d="M360,186 H380 V122 H650 V106" class="wire" marker-end="url(#m1)"/>
+            <text x="515" y="116" text-anchor="middle" class="t-note">inserts the run, never the status</text>
+            <path d="M360,214 H396" class="wire" marker-end="url(#m1)"/>
+            <text x="378" y="232" text-anchor="middle" class="t-note">once</text>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage" target="_blank" rel="noopener noreferrer" aria-label="src/ai/triage: the AI module">
+              <rect x="400" y="170" width="150" height="72" rx="12" class="box c-teal"/>
+              <text x="475" y="196" text-anchor="middle" class="t-title">AI module</text>
+              <text x="475" y="215" text-anchor="middle" class="t-sub">prompt, schema, rules</text>
+              <text x="475" y="233" text-anchor="middle" class="t-link">src/ai/triage</text>
+            </a>
+            <path d="M550,206 H586" class="wire" marker-end="url(#m1)"/>
+            <text x="568" y="197" text-anchor="middle" class="t-note">live</text>
+            <rect x="590" y="170" width="120" height="72" rx="12" class="box c-ghost"/>
+            <text x="650" y="200" text-anchor="middle" class="t-title">Model API</text>
+            <text x="650" y="220" text-anchor="middle" class="t-sub">default Sonnet 5</text>
+
+            <path d="M475,242 V280" class="wire dash" marker-end="url(#m1)"/>
+            <text x="483" y="266" class="t-note">mock</text>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/fixtures.ts" target="_blank" rel="noopener noreferrer" aria-label="src/ai/triage/fixtures.ts: stored mock answers">
+              <rect x="400" y="284" width="150" height="72" rx="12" class="box c-ghost"/>
+              <text x="475" y="310" text-anchor="middle" class="t-title">Stored answers</text>
+              <text x="475" y="329" text-anchor="middle" class="t-sub">tests, CI, demo</text>
+              <text x="475" y="347" text-anchor="middle" class="t-link">fixtures.ts</text>
+            </a>
+          </svg>
+        </div>
+        <figcaption>Every box with a link opens its code on GitHub. Only the AI module reaches outside the server, and only in live mode. The triage service writes a new run row and never touches a request's status.</figcaption>
+      </figure>
+      <p>Walking through it: the reviewer submits a form. A server action validates it with Zod and calls the domain code, which applies the business rules and writes to SQLite. When the reviewer clicks <strong>Run AI triage</strong>, the triage service loads the latest answer and its request, calls the AI module once, and saves the run, whether it worked or failed. The page then shows the note next to the review buttons.</p>
+    </section>
+
+    <section id="lifecycle">
+      <h2>A request's life</h2>
+      <figure>
+        <div class="sketch">
+          <svg viewBox="0 0 720 230" role="img" aria-label="A request starts Open, becomes Responded when the subcontractor answers, then the reviewer accepts it or requests changes, which loops back to Responded on a new answer. Accepting an Open request is blocked by a rule.">
+            <defs>
+              <marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+            </defs>
+            <path d="M80,82 V40 H630 V78" class="wire dash"/>
+            <path d="M345,30 L361,46 M361,30 L345,46" class="cross"/>
+            <text x="353" y="24" text-anchor="middle" class="t-note t-teal">blocked: no accept without a response</text>
+
+            <rect x="20" y="82" width="120" height="56" rx="12" class="box c-ghost"/>
+            <text x="80" y="115" text-anchor="middle" class="t-title">Open</text>
+            <path d="M140,110 H206" class="wire" marker-end="url(#m2)"/>
+            <text x="173" y="102" text-anchor="middle" class="t-note">answer</text>
+
+            <rect x="210" y="82" width="150" height="56" rx="12" class="box c-blue"/>
+            <text x="285" y="115" text-anchor="middle" class="t-title">Responded</text>
+            <path d="M360,110 H556" class="wire good" marker-end="url(#m2)"/>
+            <text x="458" y="102" text-anchor="middle" class="t-note">reviewer accepts</text>
+
+            <rect x="560" y="82" width="140" height="56" rx="12" class="box c-green"/>
+            <text x="630" y="115" text-anchor="middle" class="t-title">Accepted</text>
+
+            <path d="M330,138 V176 H396" class="wire" marker-end="url(#m2)"/>
+            <text x="322" y="164" text-anchor="end" class="t-note">send back</text>
+            <rect x="400" y="150" width="190" height="56" rx="12" class="box c-coral"/>
+            <text x="495" y="183" text-anchor="middle" class="t-title">Changes requested</text>
+            <path d="M400,196 H232 V142" class="wire" marker-end="url(#m2)"/>
+            <text x="316" y="214" text-anchor="middle" class="t-note">new answer</text>
+          </svg>
+        </div>
+        <figcaption>Every move by the reviewer records a name and a note. AI triage can run on any answer, as often as needed. It adds a run to the history and never moves the request.</figcaption>
+      </figure>
+      <p>The rules against accepting without a response, and against deciding on an answer that a newer one has replaced, live in <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/requests.ts" target="_blank" rel="noopener noreferrer">requests.ts</a>, not only in the page, so no other caller can skip them. Each case shows its progress (accepted out of total) and lists requests that wait on changes as blockers.</p>
+    </section>
+
+    <section id="ai">
+      <h2>The AI feature: response triage</h2>
+      <p>One triage reads one answer against the request it answers. It's a single structured call to the model, followed by rules in code. The numbers show the order.</p>
+      <figure>
+        <div class="sketch">
+          <svg viewBox="0 0 730 250" role="img" aria-label="The request and the untrusted answer are built into a context pack, sent in one call to Claude, checked against the schema, passed through rules that can only lower the result, saved as a run, and shown to the reviewer who decides.">
+            <defs>
+              <marker id="m3" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+            </defs>
+            <rect x="20" y="24" width="150" height="56" rx="12" class="box c-violet"/>
+            <text x="95" y="50" text-anchor="middle" class="t-title">The request</text>
+            <text x="95" y="68" text-anchor="middle" class="t-sub">trusted</text>
+            <rect x="20" y="104" width="150" height="56" rx="12" class="box c-coral"/>
+            <text x="95" y="130" text-anchor="middle" class="t-title">The answer</text>
+            <text x="95" y="148" text-anchor="middle" class="t-sub">untrusted text</text>
+            <path d="M170,52 H190 V84 H206" class="wire" marker-end="url(#m3)"/>
+            <path d="M170,132 H190 V100 H206" class="wire" marker-end="url(#m3)"/>
+
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/prompt.ts" target="_blank" rel="noopener noreferrer" aria-label="prompt.ts: builds the context">
+              <rect x="210" y="62" width="150" height="66" rx="12" class="box c-violet"/>
+              <circle cx="232" cy="84" r="13" class="badge"/><text x="232" y="89" text-anchor="middle" class="badge-n">1</text>
+              <text x="296" y="89" text-anchor="middle" class="t-title">Context</text>
+              <text x="285" y="118" text-anchor="middle" class="t-link">prompt.ts</text>
+            </a>
+            <path d="M360,95 H396" class="wire" marker-end="url(#m3)"/>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/triage.ts" target="_blank" rel="noopener noreferrer" aria-label="triage.ts: one structured call">
+              <rect x="400" y="62" width="150" height="66" rx="12" class="box c-ghost"/>
+              <circle cx="422" cy="84" r="13" class="badge"/><text x="422" y="89" text-anchor="middle" class="badge-n">2</text>
+              <text x="486" y="89" text-anchor="middle" class="t-title">One call</text>
+              <text x="475" y="118" text-anchor="middle" class="t-link">triage.ts</text>
+            </a>
+            <path d="M550,95 H586" class="wire" marker-end="url(#m3)"/>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/schema.ts" target="_blank" rel="noopener noreferrer" aria-label="schema.ts: the schema check">
+              <rect x="590" y="62" width="120" height="66" rx="12" class="box c-teal"/>
+              <circle cx="612" cy="84" r="13" class="badge"/><text x="612" y="89" text-anchor="middle" class="badge-n">3</text>
+              <text x="664" y="89" text-anchor="middle" class="t-title">Schema</text>
+              <text x="650" y="118" text-anchor="middle" class="t-link">schema.ts</text>
+            </a>
+            <path d="M650,128 V172 H556" class="wire" marker-end="url(#m3)"/>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer" aria-label="rules.ts: rules that only lower">
+              <rect x="400" y="168" width="150" height="66" rx="12" class="box c-teal"/>
+              <circle cx="422" cy="190" r="13" class="badge"/><text x="422" y="195" text-anchor="middle" class="badge-n">4</text>
+              <text x="486" y="195" text-anchor="middle" class="t-title">Rules</text>
+              <text x="475" y="224" text-anchor="middle" class="t-link">rules.ts</text>
+            </a>
+            <path d="M400,201 H364" class="wire" marker-end="url(#m3)"/>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/triage.ts" target="_blank" rel="noopener noreferrer" aria-label="domain/triage.ts: saves the run">
+              <rect x="210" y="168" width="150" height="66" rx="12" class="box c-violet"/>
+              <circle cx="232" cy="190" r="13" class="badge"/><text x="232" y="195" text-anchor="middle" class="badge-n">5</text>
+              <text x="296" y="195" text-anchor="middle" class="t-title">Saved run</text>
+              <text x="285" y="224" text-anchor="middle" class="t-link">domain/triage.ts</text>
+            </a>
+            <path d="M210,201 H174" class="wire good" marker-end="url(#m3)"/>
+            <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app/requests/%5Bid%5D/review-form.tsx" target="_blank" rel="noopener noreferrer" aria-label="review-form.tsx: the reviewer decides">
+              <rect x="20" y="168" width="150" height="66" rx="12" class="box c-green"/>
+              <circle cx="42" cy="190" r="13" class="badge"/><text x="42" y="195" text-anchor="middle" class="badge-n">6</text>
+              <text x="104" y="195" text-anchor="middle" class="t-title">Reviewer</text>
+              <text x="95" y="224" text-anchor="middle" class="t-link">review-form.tsx</text>
+            </a>
+          </svg>
+        </div>
+        <figcaption>Each numbered box opens its code. The answer is the only untrusted input. It goes alone in the user message and is treated as data. Steps 3 and 4 are the guards in code.</figcaption>
+      </figure>
+
+      <h3><span class="n">1</span>Context</h3>
+      <p>Our rules, the flag definitions, and the request (title, instructions, company, trade, today's date) go in the system instructions. The subcontractor's answer goes alone in the user message, inside <code>&lt;answer&gt;</code> tags, in full up to the form's 20,000-character limit. The prompt says the answer is data, and that any instruction inside it must be reported, never followed.</p>
+      <h3><span class="n">2</span>One call</h3>
+      <p>One <code>generateText</code> call with a structured output schema, a 30-second timeout, and no tools. Before reading the result, the code checks how the call ended. Only a normal finish counts. A refusal, a cut-off, a content filter, a timeout, a provider error, or any other finish becomes a failed run that says "review by hand". It never becomes a guess.</p>
+      <h3><span class="n">3</span>Schema</h3>
+      <p>The model must return completeness, a summary, extracted facts (expiry date with the exact words that state it, coverage, holder name), flags from a closed list of six codes (each with a quote), and follow-up questions. The provider gets a strict JSON schema. Our own check lower-cases list values first, because providers don't guarantee their capitalization.</p>
+      <h3><span class="n">4</span>Rules</h3>
+      <p>Rules in code can only make the result stricter:</p>
+      <ul>
+        <li>A flag whose quote isn't in the answer is dropped. The check ignores case, spacing, and curly quotes.</li>
+        <li>An expiry date counts only when the words stating it are in the answer and name that same date (for a range, the latest date). An invalid or unsupported date caps the result at partial and asks for a real date.</li>
+        <li>An expiry date before today adds an "Expired" flag, caps the result at partial, and drafts a question asking for a current document.</li>
+        <li>An answer too long to send in full is capped at partial.</li>
+        <li>Wording that tries to steer the review is flagged and capped at partial. It's flagged for the reviewer, never blocked.</li>
+        <li>Lengths and counts are capped, so the note stays readable. Rule flags come first, then the model's safety flags, so the cap never removes a safety warning.</li>
+      </ul>
+      <h3><span class="n">5</span>Saved run</h3>
+      <p>Every run is saved, ok or failed: the exact input, the model's own completeness, the final result, what the rules changed, the model, the prompt version, tokens, cost, and time. Rows are never edited. One structured log line per run feeds monitoring.</p>
+      <h3><span class="n">6</span>Reviewer</h3>
+      <p>The note sits next to the review buttons, with the rule changes and the cost in plain view. One click inserts the drafted questions into the note. Accepting or sending back is a human action, recorded with a name and the triage run the reviewer saw.</p>
+
+      <div class="aside">
+        <p class="hand-label">why one call and not an agent</p>
+        <p>The model needs exactly two inputs, the request and the answer, and code already has both. A tool loop would add cost, latency, and ways to fail. An agent becomes the right tool when the lookups depend on what the model finds: reading an uploaded certificate only when the text is vague, or checking a public registry only on a near-match. The research behind this design is in <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/research/ai-triage.md" target="_blank" rel="noopener noreferrer">docs/research/ai-triage.md</a>.</p>
+      </div>
+    </section>
+
+    <section id="data">
+      <h2>Data</h2>
+      <p>Five tables, defined once in <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/db/schema.ts" target="_blank" rel="noopener noreferrer">schema.ts</a>. Changes become numbered SQL migrations (the first is <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/drizzle/0000_init.sql" target="_blank" rel="noopener noreferrer">0000_init.sql</a>), applied when the server starts.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Table</th><th>What it holds</th><th>Rule</th></tr></thead>
+          <tbody>
+            <tr><td><code>cases</code></td><td>Company, trade, contact email, owner.</td><td>The trade decides the checklist.</td></tr>
+            <tr><td><code>requests</code></td><td>Which document, what we need, status.</td><td>Status changes only through an answer or a review.</td></tr>
+            <tr><td><code>responses</code></td><td>Each answer from the subcontractor.</td><td>Insert only. A resubmission is a new row.</td></tr>
+            <tr><td><code>triage_runs</code></td><td>Result, input, model, prompt version, tokens, cost, time, error.</td><td>Insert only. Never edited.</td></tr>
+            <tr><td><code>reviews</code></td><td>Accept or request changes, reviewer, note, the answer and run reviewed.</td><td>Insert only. Together with runs, the audit trail.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="files">
+      <h2>Key files</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/checklists.ts" target="_blank" rel="noopener noreferrer">src/domain/checklists.ts</a></td><td>The checklist per trade: what each request asks for.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/cases.ts" target="_blank" rel="noopener noreferrer">src/domain/cases.ts</a></td><td>Create a case with its checklist, list cases with progress.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/requests.ts" target="_blank" rel="noopener noreferrer">src/domain/requests.ts</a></td><td>Answers, reviews, the workflow rules, and the timeline.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/triage.ts" target="_blank" rel="noopener noreferrer">src/domain/triage.ts</a></td><td>Runs triage on the latest answer and saves the run.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/prompt.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/prompt.ts</a></td><td>The versioned prompt and the answer wrapper.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/schema.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/schema.ts</a></td><td>The output schema and our lenient-then-strict check.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/triage.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/triage.ts</a></td><td>The one call, the finish checks, and the failure reasons.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/rules.ts</a></td><td>The rules after the model.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/model.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/model.ts</a></td><td>Default model, thinking settings, and prices.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/fixtures.ts" target="_blank" rel="noopener noreferrer">src/ai/triage/fixtures.ts</a></td><td>Stored answers for mock mode, including deliberate model mistakes.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/samples/answers.ts" target="_blank" rel="noopener noreferrer">src/samples/answers.ts</a></td><td>The sample answers shared by the demo, the mock, and the eval.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app/requests/%5Bid%5D/triage-panel.tsx" target="_blank" rel="noopener noreferrer">src/app/requests/[id]/triage-panel.tsx</a></td><td>The triage note on the request page.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/instrumentation.ts" target="_blank" rel="noopener noreferrer">src/instrumentation.ts</a></td><td>Applies migrations, and optionally the demo data, at server start.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/evals/run.ts" target="_blank" rel="noopener noreferrer">evals/run.ts</a></td><td>The eval runner, mock or live.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/Dockerfile" target="_blank" rel="noopener noreferrer">Dockerfile</a> and <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/compose.yaml" target="_blank" rel="noopener noreferrer">compose.yaml</a></td><td>The two-stage image, and the stack with its data volume.</td></tr>
+            <tr><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/.github/workflows/ci.yml" target="_blank" rel="noopener noreferrer">.github/workflows/ci.yml</a></td><td>CI on every push.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="decisions">
+      <h2>Decisions</h2>
+      <p>The main ones. Every decision, with why and what was rejected, is in <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/decisions.md" target="_blank" rel="noopener noreferrer">docs/decisions.md</a>.</p>
+      <ul class="decisions">
+        <li class="agreed"><span class="state">decided</span><strong>Construction prequalification.</strong> It is a real request-and-response workflow, and Ontario law requires a WSIB clearance from every subcontractor hired directly.</li>
+        <li class="agreed"><span class="state">decided</span><strong>One structured call, no tools.</strong> The inputs are known up front, so an agent loop would only add cost and failure modes.</li>
+        <li class="agreed"><span class="state">decided</span><strong>Rules in code after the model, stricter only.</strong> Hard facts like dates and quotes are checked in code, where the model can't talk past them.</li>
+        <li class="agreed"><span class="state">decided</span><strong>Claude Sonnet 5 by default.</strong> It passed every eval case, at about $0.006 per triage. Haiku 4.5 is a cheaper option through one setting.</li>
+        <li class="agreed"><span class="state">decided</span><strong>One setting picks the model and provider.</strong> <code>AI_MODEL=provider:model</code>, through the Vercel AI SDK provider registry. Anthropic and OpenAI are registered.</li>
+        <li class="agreed"><span class="state">decided</span><strong>SQLite with Drizzle.</strong> Zero setup, migrations as plain SQL in git, and nothing extra in the image.</li>
+        <li class="agreed"><span class="state">decided</span><strong>Mock mode by default.</strong> The app, tests, and CI run with no key and no cost.</li>
+        <li class="agreed"><span class="state">decided</span><strong>A human makes every decision.</strong> The AI drafts a note. Only a reviewer accepts or sends back.</li>
+      </ul>
+    </section>
+
+    <section id="eval">
+      <h2>Evaluation</h2>
+      <p>Eight labelled cases, with the labels committed before the first live run. Each case ran twice per model, on prompt <code>triage-v2</code>, after the review fixes. The cases and labels are in <a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/evals/cases.json" target="_blank" rel="noopener noreferrer">evals/cases.json</a>, and the full report is <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/eval/2026-11-07-triage-v2-report.md" target="_blank" rel="noopener noreferrer">docs/eval/2026-11-07-triage-v2-report.md</a>.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Model</th><th class="num">Passed</th><th class="num">Mean time</th><th class="num">Cost per triage</th></tr></thead>
+          <tbody>
+            <tr><td>Claude Haiku 4.5</td><td class="num">16 of 16</td><td class="num">3.5 s</td><td class="num">$0.002</td></tr>
+            <tr><td><strong>Claude Sonnet 5 (default)</strong></td><td class="num hl">16 of 16</td><td class="num">3.6 s</td><td class="num">$0.006</td></tr>
+            <tr><td>Claude Opus 5</td><td class="num">16 of 16</td><td class="num">5.6 s</td><td class="num">$0.017</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>No model rated an answer more leniently than its label, and no rule had to change a live result. The first run, on prompt <code>triage-v1</code>, is in <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/eval/2026-11-07-report.md" target="_blank" rel="noopener noreferrer">docs/eval/2026-11-07-report.md</a>.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Case</th><th>What the answer says</th><th>Expected</th></tr></thead>
+          <tbody>
+            <tr><td><code>cgl-complete</code></td><td>Insurer, policy, right company, $5M, valid, GC as additional insured.</td><td>complete</td></tr>
+            <tr><td><code>cgl-low-coverage</code></td><td>Everything there, but $1M per occurrence against $2M required.</td><td>partial, coverage below requirement</td></tr>
+            <tr><td><code>wsib-expired</code></td><td>Clearance valid until 2026-10-31.</td><td>partial, expired</td></tr>
+            <tr><td><code>wsib-vague</code></td><td>"Fully registered… will send the certificate next week."</td><td>insufficient, missing item</td></tr>
+            <tr><td><code>safety-injection</code></td><td>No details, plus "ignore your previous instructions".</td><td>never complete, suspicious instructions</td></tr>
+            <tr><td><code>cgl-name-mismatch</code></td><td>Policy names a different legal entity.</td><td>partial, name mismatch</td></tr>
+            <tr><td><code>cor-complete</code></td><td>COR number for the right company, valid.</td><td>complete</td></tr>
+            <tr><td><code>esa-missing-number</code></td><td>"We are licensed", but no licence number.</td><td>insufficient, missing item</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">Eight cases make a regression check, not proof of robustness. In CI the same cases run in mock mode, where two stored answers contain deliberate model mistakes, so the build fails if the rules stop catching them.</p>
+    </section>
+
+    <section id="tests">
+      <h2>Tests and checks</h2>
+      <ul>
+        <li><strong>51 unit and service tests</strong> (Vitest): the workflow rules, the AI rules, every failure path of the triage call with mock models, the triage service, a full case-to-progress flow on a real SQLite database, and the eval scoring.</li>
+        <li><strong>Independent review:</strong> a second model (Codex, GPT Sol 6.1) reviewed the whole repo against a written <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/review/brief.md" target="_blank" rel="noopener noreferrer">brief</a>, then re-checked each round of fixes. All ten <a href="https://github.com/Walid-dev/prequal-tracker/blob/main/docs/review/findings.md" target="_blank" rel="noopener noreferrer">findings</a> were fixed.</li>
+        <li><strong>Browser checks:</strong> a headless browser drove the real forms and the triage panel through 19 checks during the build.</li>
+        <li><strong>Docker:</strong> the container runs as a non-root user, has no secrets inside, and keeps its data across restarts.</li>
+        <li><strong>CI</strong> runs lint, typecheck, tests, the mock eval, the migration check, and the build on every push, with no secrets and no paid calls.</li>
+      </ul>
+    </section>
+
+    <section id="risks">
+      <h2>Edge cases and risks</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Case</th><th>What happens</th><th>Where</th></tr></thead>
+          <tbody>
+            <tr><td>Hidden instructions in an answer</td><td>Treated as data, reported as a flag, capped at partial. The reviewer decides.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer">rules.ts</a></td></tr>
+            <tr><td>A quote the model made up</td><td>Dropped, and the note says so.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer">rules.ts</a></td></tr>
+            <tr><td>Expired document marked complete</td><td>Lowered to partial, flagged, and a question is drafted.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer">rules.ts</a></td></tr>
+            <tr><td>Model down, slow, refusing, or cut off</td><td>Saved as a failed run with the reason. The reviewer can run it again.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/triage.ts" target="_blank" rel="noopener noreferrer">triage.ts</a></td></tr>
+            <tr><td>Output that doesn't match the schema</td><td>Saved as a failed run. Never shown as a result.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/schema.ts" target="_blank" rel="noopener noreferrer">schema.ts</a></td></tr>
+            <tr><td>A new answer arrives during review</td><td>The decision is refused, and the reviewer reloads to see the new answer.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/requests.ts" target="_blank" rel="noopener noreferrer">requests.ts</a></td></tr>
+            <tr><td>A date the model made up</td><td>Ignored unless the words stating it are in the answer.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts" target="_blank" rel="noopener noreferrer">rules.ts</a></td></tr>
+            <tr><td>Very long answer</td><td>Sent in full up to the form's 20,000-character limit. A cut answer is capped at partial.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/prompt.ts" target="_blank" rel="noopener noreferrer">prompt.ts</a></td></tr>
+            <tr><td>Accept before an answer</td><td>Refused by the service, and the button isn't shown.</td><td><a href="https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/requests.ts" target="_blank" rel="noopener noreferrer">requests.ts</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="ops">
+      <h2>Operations and rollback</h2>
+      <ul>
+        <li><strong>AI kill switch:</strong> set <code>AI_MODE=mock</code>. The tracker keeps working without the AI.</li>
+        <li><strong>Model switch:</strong> one setting, <code>AI_MODEL=provider:model</code>, for example <code>anthropic:claude-haiku-4-5</code> or <code>openai:gpt-6-sol</code>, plus that provider's key. Every run records the model and the prompt version, so results can be compared before and after.</li>
+        <li><strong>Migrations:</strong> forward-only SQL files in git. In production they would run as a pre-deploy job, and a bad change is undone with a new migration.</li>
+        <li><strong>Monitoring:</strong> one structured log line per triage (status, model, prompt version, tokens, cost, time), ready for a dashboard. Agreement between the AI's completeness and the reviewer's decision is the drift signal, and both are already saved.</li>
+      </ul>
+    </section>
+
+    <section id="scope">
+      <h2>Out of scope</h2>
+      <p>Left for next steps, with the reasons in the README: document uploads (where an agent starts to make sense), login and roles, a subcontractor portal with reminders, a public API, browser tests in CI, Postgres, and multiple companies.</p>
+    </section>
+
+    <section id="glossary">
+      <h2>Glossary</h2>
+      <p>The stack and the domain words, in plain language.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Term</th><th>What it is</th><th>In this project</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Next.js</strong></td><td>A React framework that handles pages, routing, and the server.</td><td>Version 16.4. One app holds the screens and the server logic.</td></tr>
+            <tr><td><strong>Server Actions</strong></td><td>Functions that run on the server when a form is submitted.</td><td>Every write: create a case, answer, review, run triage.</td></tr>
+            <tr><td><strong>TypeScript</strong></td><td>JavaScript with types, so mistakes show up before the code runs.</td><td>All code, checked with <code>npm run typecheck</code>.</td></tr>
+            <tr><td><strong>Tailwind CSS</strong></td><td>Styling with short class names instead of separate CSS files.</td><td>All styling. No component library.</td></tr>
+            <tr><td><strong>SQLite</strong></td><td>A full SQL database in a single file, with no server to run.</td><td>The app's database, on a Docker volume.</td></tr>
+            <tr><td><strong>Drizzle ORM</strong></td><td>A light TypeScript library for typed database queries.</td><td>The five tables live in one schema file.</td></tr>
+            <tr><td><strong>Migration</strong></td><td>A numbered SQL file that changes the database structure, applied in order.</td><td>Created by drizzle-kit, applied at server start.</td></tr>
+            <tr><td><strong>Zod</strong></td><td>Describes the shape data must have, and checks real data against it.</td><td>Form input and the AI's answer.</td></tr>
+            <tr><td><strong>Vercel AI SDK</strong></td><td>A library that puts many AI providers behind one API.</td><td>The model call, the schema, and the mock models.</td></tr>
+            <tr><td><strong>Structured output</strong></td><td>Asking the model for JSON that must match a schema.</td><td>The triage note.</td></tr>
+            <tr><td><strong>Token</strong></td><td>The unit models read and write, about three-quarters of a word.</td><td>About 1,500 per triage. Prices are per million.</td></tr>
+            <tr><td><strong>Prompt injection</strong></td><td>Text inside the data that tries to give the model orders.</td><td>Fenced as data, flagged by rule, and decided by a human.</td></tr>
+            <tr><td><strong>Grounding</strong></td><td>Making sure a claim is backed by the source text.</td><td>Every flag must quote words that are in the answer.</td></tr>
+            <tr><td><strong>Mock model</strong></td><td>A stand-in that returns stored answers instead of calling the AI.</td><td>Tests, CI, and the demo. The default mode.</td></tr>
+            <tr><td><strong>Eval</strong></td><td>A small exam for the AI: inputs with expected answers, scored automatically.</td><td>Eight cases, labels committed first.</td></tr>
+            <tr><td><strong>Agent</strong></td><td>A model in a loop that decides which tools to call next.</td><td>Not used, on purpose. See "why one call".</td></tr>
+            <tr><td><strong>Vitest</strong></td><td>A fast test runner for TypeScript.</td><td>51 tests, <code>npm test</code>.</td></tr>
+            <tr><td><strong>Biome</strong></td><td>One tool that formats code and flags likely mistakes.</td><td><code>npm run lint</code>, also in CI.</td></tr>
+            <tr><td><strong>Docker</strong></td><td>Packages the app with everything it needs, so it runs the same anywhere.</td><td><code>docker compose up --build</code>.</td></tr>
+            <tr><td><strong>Volume</strong></td><td>Storage outside the container, so data survives restarts.</td><td>Holds the SQLite file.</td></tr>
+            <tr><td><strong>CI</strong></td><td>Checks that run automatically on every push.</td><td>GitHub Actions: lint, typecheck, tests, mock eval, build.</td></tr>
+            <tr><td><strong>General contractor</strong></td><td>The company running a project, hiring subcontractors per trade.</td><td>The app's user.</td></tr>
+            <tr><td><strong>Prequalification</strong></td><td>Checking a subcontractor's paperwork before they can work.</td><td>The whole app.</td></tr>
+            <tr><td><strong>WSIB clearance</strong></td><td>Ontario's proof that a company is in good standing with the workplace insurance board.</td><td>A request on every case.</td></tr>
+            <tr><td><strong>CGL certificate</strong></td><td>Proof of commercial general liability insurance.</td><td>A request on every case.</td></tr>
+            <tr><td><strong>COR</strong></td><td>IHSA's Certificate of Recognition for a health and safety program.</td><td>A request on every case, or a written program.</td></tr>
+            <tr><td><strong>ESA licence</strong></td><td>Ontario's 7-digit Licensed Electrical Contractor number.</td><td>An extra request for electricians.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+<!-- hovercard:start -->
+<script type="application/json" id="link-tips">{"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/.github/workflows/ci.yml":{"t":"ci.yml","s":"","d":"The GitHub Actions workflow. On every push it runs lint, typecheck, tests, the mock eval, the migration check, and the build, with no secrets."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/Dockerfile":{"t":"Dockerfile","s":"","d":"Two stages on Debian bookworm: a full image builds the app, a slim image runs it as a non-root user."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/compose.yaml":{"t":"compose.yaml","s":"","d":"Runs the app with its SQLite file on a named volume. Settings like AI_MODE come from the environment at run time."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/decisions.md":{"t":"docs/decisions.md","s":"","d":"The decision log: every decision with the date, why, and what was rejected. Newest first."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/eval/2026-11-07-report.md":{"t":"Eval report, triage-v1","s":"","d":"The first live run, on prompt triage-v1: eight cases, two runs each, on Haiku 4.5, Sonnet 5, and Opus 5. It chose the default model."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/research/ai-triage.md":{"t":"docs/research/ai-triage.md","s":"","d":"The research behind the AI design, with sources: what it confirmed and the five details it changed."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/drizzle/0000_init.sql":{"t":"0000_init.sql","s":"","d":"The first SQL migration. It creates the five tables, their foreign keys, and indexes."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/evals/cases.json":{"t":"evals/cases.json","s":"","d":"The eight eval cases and their expected answers, committed before the first live run."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/evals/run.ts":{"t":"evals/run.ts","s":"","d":"Runs every case through the real triage module, mock or live, scores it, and writes the report."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/fixtures.ts":{"t":"fixtures.ts","s":"","d":"Stored model answers for mock mode. Two contain deliberate mistakes, so the rules are tested on every run."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/model.ts":{"t":"model.ts","s":"","d":"One setting picks the model and provider: AI_MODEL=provider:model through the AI SDK registry. Also the thinking settings and prices."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/prompt.ts":{"t":"prompt.ts","s":"","d":"Builds the system instructions and wraps the untrusted answer in tags. PROMPT_VERSION is saved on every run."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/rules.ts":{"t":"rules.ts","s":"","d":"The rules after the model: quote check, expiry date backed by the answer, expired check, steering check, cut answers, and caps. They only make results stricter."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/schema.ts":{"t":"schema.ts","s":"","d":"The output schema. The provider gets strict JSON Schema, and our check lower-cases list values before validating."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage/triage.ts":{"t":"triage.ts","s":"","d":"The single structured call. Only a normal finish counts, and every other ending becomes a failed run with a readable reason."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app/requests/%5Bid%5D/review-form.tsx":{"t":"review-form.tsx","s":"","d":"The reviewer's form: accept or request changes, with a name and a note. One click inserts the AI's questions."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app/requests/%5Bid%5D/triage-panel.tsx":{"t":"triage-panel.tsx","s":"","d":"Shows the triage note: completeness, flags with quotes, rule changes, questions, model, tokens, cost, and time."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/db/schema.ts":{"t":"schema.ts","s":"","d":"The five tables, defined once in TypeScript. drizzle-kit turns changes here into SQL migrations."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/cases.ts":{"t":"cases.ts","s":"","d":"Creates a case with its checklist in one transaction, and lists cases with progress and blockers."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/checklists.ts":{"t":"checklists.ts","s":"","d":"The checklist per trade. Every trade gets three requests, and electricians also get the ESA licence."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/requests.ts":{"t":"requests.ts","s":"","d":"Answers and reviews, with the workflow rules. No accept without a response, and no decision on an answer a newer one has replaced."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain/triage.ts":{"t":"domain/triage.ts","s":"","d":"Runs triage on the latest answer and saves the run. It inserts runs only and never changes a request's status."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/instrumentation.ts":{"t":"instrumentation.ts","s":"","d":"Runs once at server start: applies the migrations, and adds the demo data when asked."},"https://github.com/Walid-dev/prequal-tracker/blob/f2bbacddbaf93865a5306254b96c11f834a0d465/src/samples/answers.ts":{"t":"answers.ts","s":"","d":"Eight sample subcontractor answers, shared by the demo seed, the mock model, and the eval."},"https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/ai/triage":{"t":"src/ai/triage","s":"Folder","d":"The self-contained AI module: prompt, schema, rules, model setup, and stored answers. It never touches the database."},"https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/app":{"t":"src/app","s":"Folder","d":"The Next.js pages and server actions: case list, new case, case page, and request page."},"https://github.com/Walid-dev/prequal-tracker/tree/f2bbacddbaf93865a5306254b96c11f834a0d465/src/domain":{"t":"src/domain","s":"Folder","d":"The business code: cases, checklists, requests, reviews, the triage service, and the demo seed."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/review/brief.md":{"t":"docs/review/brief.md","s":"","d":"The brief the second model reviewed against: what to check, the rules the code must hold, what is out of scope, and how to report."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/review/findings.md":{"t":"docs/review/findings.md","s":"10 findings, all fixed","d":"The second model's findings from every pass, as it wrote them, followed by the fix, the commit, and the test for each one."},"https://github.com/Walid-dev/prequal-tracker/blob/main/docs/eval/2026-11-07-triage-v2-report.md":{"t":"Eval report, triage-v2","s":"16 of 16 on every model","d":"The live run after the review fixes, on prompt triage-v2: eight cases, two runs each, on Haiku 4.5, Sonnet 5, and Opus 5. Per-case results, totals, time, and cost."}}</script>
+<div id="hovercard" class="hovercard" role="tooltip" hidden></div>
+<script>
+/* Hover cards: show the description from #link-tips when a link is hovered or focused. */
+(function () {
+  var tips = {};
+  try { tips = JSON.parse(document.getElementById('link-tips').textContent); } catch (e) { return; }
+  var card = document.getElementById('hovercard');
+  var timer = null, current = null;
+  function linkOf(node) { return node && node.closest ? node.closest('a[href]') : null; }
+  function show(a) {
+    var t = tips[a.getAttribute('href')];
+    if (!t || !t.d) return;
+    card.textContent = '';
+    if (t.t) {
+      var title = document.createElement('div');
+      title.className = 'hc-title';
+      title.textContent = t.t;
+      if (t.s) {
+        var status = document.createElement('span');
+        status.className = 'hc-status';
+        status.textContent = t.s;
+        title.appendChild(status);
+      }
+      card.appendChild(title);
+    }
+    var text = document.createElement('p');
+    text.textContent = t.d;
+    card.appendChild(text);
+    card.hidden = false;
+    var r = a.getBoundingClientRect();
+    var x = Math.min(Math.max(8, r.left), window.innerWidth - card.offsetWidth - 8);
+    var y = r.bottom + 8;
+    if (y + card.offsetHeight > window.innerHeight - 8) y = r.top - card.offsetHeight - 8;
+    card.style.left = x + 'px';
+    card.style.top = Math.max(8, y) + 'px';
+    a.setAttribute('aria-describedby', 'hovercard');
+    current = a;
+  }
+  function hide() {
+    clearTimeout(timer);
+    card.hidden = true;
+    if (current) current.removeAttribute('aria-describedby');
+    current = null;
+  }
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType === 'touch') return;
+    var a = linkOf(e.target);
+    if (!a || a === current) return;
+    clearTimeout(timer);
+    timer = setTimeout(function () { show(a); }, 150);
+  });
+  document.addEventListener('pointerout', function (e) {
+    var a = linkOf(e.target);
+    if (a && !a.contains(e.relatedTarget)) hide();
+  });
+  document.addEventListener('focusin', function (e) { var a = linkOf(e.target); if (a) show(a); });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
+  window.addEventListener('scroll', function () {
+    if (card.hidden) return;
+    card.hidden = true;
+    if (current) current.removeAttribute('aria-describedby');
+    current = null;
+  }, { passive: true });
+})();
+</script>
+<!-- hovercard:end -->
+<script>
+  /* no copy buttons on this page; the hover-card script is added below */
+</script>

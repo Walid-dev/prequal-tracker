@@ -66,6 +66,7 @@ export async function reviewAction(
     action: String(formData.get("action") ?? ""),
     reviewer: String(formData.get("reviewer") ?? ""),
     note: String(formData.get("note") ?? ""),
+    responseId: String(formData.get("responseId") ?? ""),
     triageRunId: String(formData.get("triageRunId") ?? ""),
   };
   const parsed = ReviewSchema.safeParse({
