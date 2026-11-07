@@ -9,9 +9,10 @@ The work can pause between gates and resume later, so this log records active ti
 | Phase | Active time |
 | --- | --- |
 | Planning (requirements, research, plan v0 to v3) | about 2 h, over two sessions |
+| Research: AI triage best practices (multi-agent, verified) | about 20 min |
 | Build, gate 1: plan | about 15 min |
 | Build, gate 2: core app | about 30 min |
-| Build, gate 3: AI module | |
+| Build, gate 3: AI module | about 15 min |
 | Build, gate 4: proof and docs | |
 | Independent review | |
 
@@ -20,7 +21,8 @@ The work can pause between gates and resume later, so this log records active ti
 1. **Gather the context.** I collected the requirements and a first draft plan from another AI model. I asked Claude Code for an honest review of that draft instead of running it.
 2. **Research before deciding.** A research workflow read the real published packages (Next.js, AI SDK, Prisma, Drizzle) instead of trusting memory. A critic agent then stress-tested the design.
 3. **Rewrite when the facts change.** With the full requirements gathered, the plan was rewritten around their core pattern (v2). Three outside AI reviews were weighed point by point, and their factual claims were checked against sources.
-4. **Lock and sequence.** Decisions were locked (v3), and an execution plan set out every commit with its files, its check, and its message.
+4. **Research before the AI module.** A multi-agent research pass checked current guidance on structured output, prompt injection, and grounding. Each claim was challenged by three verifiers. It confirmed the one-call design and changed five details: see `docs/research/ai-triage.md`.
+5. **Lock and sequence.** Decisions were locked (v3), and an execution plan set out every commit with its files, its check, and its message.
 
 `docs/PLAN.md` shows how the plan evolved from v0 to v3.
 
@@ -50,6 +52,7 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 
 - **Step 2:** no placeholder test. Real tests start in step 3. The page check used the production build's rendered output instead of a dev server.
 - **Step 3 to step 6:** the demo seed moved to step 6, because it needs the checklists (step 5) and real answers (step 6).
+- **Step 8:** the plan said "Request changes" would open with the AI's questions filled in. The note box is shared with Accept, so a pre-filled note could be saved by mistake. One click now inserts the questions instead.
 - **Step 6:** the eight sample answers live in one file, `src/samples/answers.ts`. The demo seed uses them now; the mock model (step 7) and the eval (step 9) will reuse the same texts.
 
 ## Transcript excerpts

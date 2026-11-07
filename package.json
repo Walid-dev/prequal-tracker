@@ -18,6 +18,8 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "4.0.98",
+    "ai": "7.0.164",
     "better-sqlite3": "13.0.3",
     "drizzle-orm": "0.45.4",
     "next": "16.4.5",

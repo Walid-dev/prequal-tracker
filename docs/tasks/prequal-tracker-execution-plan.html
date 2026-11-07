@@ -283,13 +283,13 @@
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
       <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. Design and decisions live in the <a href="https://claude.ai/artifact/W3cjhLjpEUBWFJ8mNjc2HX" target="_blank" rel="noopener noreferrer">kickoff page</a>.</p>
-      <p class="small muted">Status: gate 2 committed and merged into <code>main</code>. Gate 3, the AI module, is next. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
+      <p class="small muted">Status: gate 3 committed and merged into <code>main</code>. Gate 4, proof and docs, is next. Artifact: <a href="https://claude.ai/artifact/TCFdjswE7YsE3jRqo5jMNR" target="_blank" rel="noopener noreferrer">this page</a></p>
       <ul class="chips">
-        <li class="chip">Now: <b>step 7</b></li>
-        <li class="chip">Commits: <b>6 of 12</b></li>
-        <li class="chip">Gates: <b>2 of 5</b></li>
+        <li class="chip">Now: <b>step 9</b></li>
+        <li class="chip">Commits: <b>8 of 12</b></li>
+        <li class="chip">Gates: <b>3 of 5</b></li>
         <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
-        <li class="chip">Active time: <b>about 45 min</b></li>
+        <li class="chip">Active time: <b>about 1 h</b></li>
       </ul>
     </header>
 
@@ -390,12 +390,12 @@
             <text x="422" y="196" class="t-sub">feat/triage · 45 min</text>
             <a href="#step-7" aria-label="Step 7 triage module">
               <rect x="416" y="208" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="429" cy="217.5" r="4.5" class="dot-ready"/>
+              <circle cx="429" cy="217.5" r="4.5" class="dot-done"/>
               <text x="440" y="222" class="t-link">Step 7<tspan class="t-cname"> triage module</tspan></text>
             </a>
             <a href="#step-8" aria-label="Step 8 triage UI">
               <rect x="416" y="227" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="429" cy="236.5" r="4.5" class="dot-ready"/>
+              <circle cx="429" cy="236.5" r="4.5" class="dot-done"/>
               <text x="440" y="241" class="t-link">Step 8<tspan class="t-cname"> triage UI</tspan></text>
             </a>
             <path d="M584,178 H600" class="wire" marker-end="url(#m1)"/>
@@ -590,7 +590,7 @@
         </li>
 
         <li class="phase" id="gate-3">Gate 3 · AI module · feat/triage · 45 min</li>
-        <li id="step-7" class="now">
+        <li id="step-7" class="done">
           <span class="num">7</span>
           <div>
             <div class="t">The triage module</div>
@@ -599,18 +599,20 @@
             <p class="files">Files: src/ai/triage/schema.ts · prompt.ts · rules.ts · model.ts · fixtures.ts · triage.ts · rules.test.ts · triage.test.ts · src/domain/triage.ts · src/domain/triage.test.ts</p>
             <p class="chk">Check: tests prove that an expired date lowers the result to partial with an EXPIRED flag, a quote not in the answer is dropped, the rules never raise, schema failures and timeouts save a failed run, and triage leaves the request status unchanged. One live call with your key returns a valid result for under $0.02.</p>
             <p class="commit">feat(triage): add response triage module with structured output and rules</p>
+            <p class="chk"><strong>☑ Done.</strong> A verified research pass ran first and changed five details: the answer sits alone in the user message, refusals and cut-offs become failed runs, list values are lower-cased before the check, dates and caps are enforced in code, and steering wording is flagged by rule. See <code>docs/research/ai-triage.md</code>. 17 new tests pass. The live call on Haiku 4.5 returned a valid, grounded result in 5 seconds for $0.0021.</p>
             <p class="ref">Docs: <a href="https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data" target="_blank" rel="noopener noreferrer">AI SDK structured output</a> · <a href="https://ai-sdk.dev/docs/ai-sdk-core/testing" target="_blank" rel="noopener noreferrer">AI SDK testing</a> · <a href="https://ai-sdk.dev/providers/ai-sdk-providers/anthropic" target="_blank" rel="noopener noreferrer">Anthropic provider</a> · <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener noreferrer">Building effective agents</a></p>
           </div>
         </li>
-        <li id="step-8">
+        <li id="step-8" class="done">
           <span class="num">8</span>
           <div>
             <div class="t">Triage on the request page</div>
             <div class="who">I</div>
-            <p>The reviewer sees the AI note next to the review buttons: completeness, summary, flags with their quotes, what the rules changed, drafted questions, model, tokens, cost, and time. "Request changes" opens with the drafted questions filled in. A mode badge always says mock or live.</p>
+            <p>The reviewer sees the AI note next to the review buttons: completeness, summary, flags with their quotes, what the rules changed, drafted questions, model, tokens, cost, and time. One click inserts the drafted questions into the note (not pre-filled, because the same box is used for Accept). A mode badge always says mock or live.</p>
             <p class="files">Files: src/app/requests/[id]/triage-panel.tsx · src/app/requests/actions.ts · src/app/requests/[id]/page.tsx · src/app/requests/[id]/review-form.tsx</p>
             <p class="chk">Check: in mock mode, the seeded expired-clearance answer shows Partial with "lowered by rule", "Request changes" opens with the questions, and a failed run shows its error and a retry button.</p>
             <p class="commit">feat(triage): show triage results on the request page</p>
+            <p class="chk"><strong>☑ Done.</strong> A headless browser passed 10 checks in mock mode: the expired clearance is lowered by rule with a drafted question, the hidden instruction is flagged and capped, triage leaves the status alone, the history shows each run, and one click inserts the questions. Each run writes one structured log line.</p>
           </div>
         </li>
         <li class="gate">
@@ -618,12 +620,12 @@
           <div>
             <div class="t">GO 3: you read two diffs, run one triage in the app</div>
             <div class="who">you</div>
-            <p>On GO, I commit, merge <code>feat/triage</code> into <code>main</code>, and open <code>feat/proof</code>.</p>
+            <p>On GO, I commit, merge <code>feat/triage</code> into <code>main</code>, and open <code>feat/proof</code>.</p> <strong>☑ GO given.</strong>
           </div>
         </li>
 
         <li class="phase" id="gate-4">Gate 4 · Proof and docs · feat/proof · 45 min · hard stop at 3 h 30</li>
-        <li id="step-9">
+        <li id="step-9" class="now">
           <span class="num">9</span>
           <div>
             <div class="t">Eval cases and runner</div>
@@ -729,9 +731,11 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+        <li><span class="when">Gate 3</span><span>AI module committed and merged into <code>main</code>: the triage module with its research-backed guards, and the triage panel. 34 tests and 10 browser checks pass.</span></li>
+        <li><span class="when">Research</span><span>A verified multi-agent research pass on AI triage confirmed the one-call design and changed five details before gate 3.</span></li>
         <li><span class="when">Gate 2</span><span>Core app committed and merged into <code>main</code>: app setup, database, Docker, cases, responses, and reviews. 17 tests and 9 browser checks pass.</span></li>
       </ol>
-      <p>Next action: gate 3, the AI triage module, on <code>feat/triage</code>.</p>
+      <p>Next action: gate 4 on <code>feat/proof</code>. First the eval cases and their expected answers, for your review.</p>
     </section>
   </main>
 </div>

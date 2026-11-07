@@ -4,6 +4,15 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
+- **2026-11-07 · The subcontractor's answer goes alone in the user message. Our rules and the request go in the system instructions.**
+  Why: research (`docs/research/ai-triage.md`) shows role separation lowers injection success, but only partly. So it's one layer. Rules in code and the reviewer's decision are the others.
+
+- **2026-11-07 · Wording that tries to steer the review is flagged in code, never blocked.**
+  Why: keyword filters help review but are not a security control. The flag and the cap at partial make the reviewer look. The model still gets the answer.
+
+- **2026-11-07 · The AI's follow-up questions are inserted with one click, not pre-filled.**
+  Why: the note box is shared with Accept. A pre-filled note could be saved on an accept by mistake.
+
 - **2026-11-07 · Sample answers live in one file.**
   Why: the demo seed, the mock model, and the eval all need the same subcontractor answers. One file (`src/samples/answers.ts`) avoids three copies that drift apart. It holds inputs only. The expected results live with the eval, so they can be committed before the first live run.
 
