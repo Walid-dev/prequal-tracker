@@ -56,6 +56,14 @@ const MONTHS = [
   "november",
   "december",
 ];
+// The month words a quote may use: full names, three-letter short forms, and "sept". Any other word is not a month.
+const MONTH_WORDS = new Map<string, number>([
+  ...MONTHS.flatMap((name, i): [string, number][] => [
+    [name, i + 1],
+    [name.slice(0, 3), i + 1],
+  ]),
+  ["sept", 9],
+]);
 // Flags that matter most to the reviewer. They go first, so the flag cap never removes them.
 const SAFETY: ReadonlySet<FlagCode> = new Set([
   "expired",
@@ -69,10 +77,7 @@ function datesIn(text: string): string[] {
     const iso = `${year}-${String(month).padStart(2, "0")}-${day.padStart(2, "0")}`;
     if (month >= 1 && parseDay(iso)) found.push(iso);
   };
-  const monthOf = (name: string) =>
-    MONTHS.findIndex((month) =>
-      month.startsWith(name.toLowerCase().slice(0, 3)),
-    ) + 1;
+  const monthOf = (name: string) => MONTH_WORDS.get(name.toLowerCase()) ?? 0;
   for (const m of text.matchAll(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/g)) {
     add(m[1], Number(m[2]), m[3]);
   }

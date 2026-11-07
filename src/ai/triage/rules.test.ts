@@ -195,6 +195,31 @@ describe("applyRules", () => {
     expect(range.completeness).toBe("partial");
   });
 
+  it("reads only real month names and short forms in a quote (R10)", () => {
+    for (const [extracted, quote] of [
+      ["2027-10-31", "Expires Octopus 31, 2027"],
+      ["2027-03-01", "Expires Marching 1, 2027"],
+      ["2027-10-31", "Expires 31 Octopus 2027"],
+    ]) {
+      const result = applyRules(
+        withExpiry(extracted, quote),
+        `${quote}.`,
+        TODAY,
+      );
+      expect(result.facts.expiryDate).toBeNull();
+      expect(result.completeness).toBe("partial");
+    }
+    for (const quote of ["Expires Sept. 30, 2027", "Expires 30 Sep 2027"]) {
+      const result = applyRules(
+        withExpiry("2027-09-30", quote),
+        `${quote}.`,
+        TODAY,
+      );
+      expect(result.facts.expiryDate).toBe("2027-09-30");
+      expect(result.completeness).toBe("complete");
+    }
+  });
+
   it("keeps a safety warning the model listed ninth, and notes that the rule confirmed it (R6)", () => {
     const words = [
       "one",
