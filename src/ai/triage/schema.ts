@@ -33,6 +33,12 @@ export const ModelOutputSchema = z.object({
       .describe(
         "Expiry or end date in YYYY-MM-DD, exactly as stated. null if the answer gives none.",
       ),
+    expiryQuote: z
+      .string()
+      .nullable()
+      .describe(
+        "The exact words in the answer that state the expiry or end date. null if the answer gives none.",
+      ),
     coverageAmount: z
       .number()
       .nullable()

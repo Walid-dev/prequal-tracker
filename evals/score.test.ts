@@ -39,7 +39,12 @@ function ok(
     result: {
       completeness,
       summary: "",
-      facts: { expiryDate: null, coverageAmount: null, holderName: null },
+      facts: {
+        expiryDate: null,
+        expiryQuote: null,
+        coverageAmount: null,
+        holderName: null,
+      },
       flags: codes.map((code) => ({ code: code as "expired", quote: "x" })),
       followUpQuestions: [],
       ruleNotes: notes,

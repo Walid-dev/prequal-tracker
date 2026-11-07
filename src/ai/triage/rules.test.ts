@@ -1,42 +1,124 @@
-// Tests for the hard rules after the model: they catch expired dates, made-up quotes, and steering, and never loosen a result.
+// Tests for the hard rules after the model: they catch expired or unsupported dates, made-up quotes, steering,
+// and cut answers, and they never loosen a result.
 import { describe, expect, it } from "vitest";
 import { applyRules } from "./rules";
-import type { ModelOutput } from "./schema";
+import type { FlagCode, ModelOutput } from "./schema";
 
 const TODAY = "2026-11-07";
 const base: ModelOutput = {
   completeness: "complete",
   summary: "Looks fine.",
-  facts: { expiryDate: null, coverageAmount: null, holderName: null },
+  facts: {
+    expiryDate: null,
+    expiryQuote: null,
+    coverageAmount: null,
+    holderName: null,
+  },
   flags: [],
   followUpQuestions: [],
 };
 
+/** A model output whose expiry date and quote are set. */
+function withExpiry(date: string, quote: string | null): ModelOutput {
+  return {
+    ...base,
+    facts: { ...base.facts, expiryDate: date, expiryQuote: quote },
+  };
+}
+
 describe("applyRules", () => {
-  it("lowers complete to partial and flags it when the expiry date is before today", () => {
+  it("flags an expired document, lowers it to partial, and asks for a current one", () => {
     const result = applyRules(
-      { ...base, facts: { ...base.facts, expiryDate: "2026-10-31" } },
-      "Valid from 2026-05-01 to 2026-10-31.",
+      withExpiry("2026-10-31", "valid to 2026-10-31"),
+      "Clearance C-1, valid to 2026-10-31.",
       TODAY,
     );
     expect(result.completeness).toBe("partial");
-    expect(result.flags).toContainEqual({
+    expect(result.flags[0]).toEqual({
       code: "expired",
-      quote: "2026-10-31",
+      quote: "valid to 2026-10-31",
       byRule: true,
     });
     expect(result.ruleNotes[0]).toMatch(/before today/);
     expect(result.followUpQuestions[0]).toMatch(/ended on 2026-10-31/);
   });
 
-  it("leaves a future expiry date alone", () => {
+  it("leaves a future expiry date backed by the answer alone", () => {
     const result = applyRules(
-      { ...base, facts: { ...base.facts, expiryDate: "2027-08-31" } },
+      withExpiry("2027-08-31", "Expires 2027-08-31"),
       "Expires 2027-08-31.",
       TODAY,
     );
     expect(result.completeness).toBe("complete");
     expect(result.ruleNotes).toEqual([]);
+  });
+
+  it("ignores an expiry date whose words are not in the answer, and never flags it as expired (R4)", () => {
+    const result = applyRules(
+      {
+        ...withExpiry("2026-10-31", "valid to 2026-10-31"),
+        flags: [{ code: "expired", quote: "valid to 2026-10-31" }],
+      },
+      "Clearance C-1, valid to 2027-08-31.",
+      TODAY,
+    );
+    expect(result.flags.some((flag) => flag.code === "expired")).toBe(false);
+    expect(result.facts.expiryDate).toBeNull();
+    expect(result.completeness).toBe("partial");
+    expect(result.followUpQuestions).toContain(
+      "Please confirm the expiry date of this document.",
+    );
+  });
+
+  it("caps an answer at partial when the expiry date isn't a real date (R5)", () => {
+    const result = applyRules(
+      withExpiry("2026-02-31", "Expires 2026-02-31"),
+      "Expires 2026-02-31.",
+      TODAY,
+    );
+    expect(result.facts.expiryDate).toBeNull();
+    expect(result.completeness).toBe("partial");
+    expect(result.followUpQuestions).toContain(
+      "Please confirm the expiry date of this document.",
+    );
+  });
+
+  it("keeps rule flags when the model already returned the maximum number of flags (R6)", () => {
+    const words = [
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+    ];
+    const answer = `${words.join(" ")}. Valid to 2026-10-31.`;
+    const result = applyRules(
+      {
+        ...withExpiry("2026-10-31", "Valid to 2026-10-31"),
+        completeness: "partial",
+        flags: words.map((word) => ({
+          code: "missing_item" as FlagCode,
+          quote: word,
+        })),
+        followUpQuestions: ["Anything else?"],
+      },
+      answer,
+      TODAY,
+    );
+    expect(result.flags).toHaveLength(8);
+    expect(result.flags[0]).toMatchObject({ code: "expired", byRule: true });
+    expect(
+      result.ruleNotes.some((note) => note.includes("Flagged by rule")),
+    ).toBe(true);
+  });
+
+  it("caps a cut answer at partial and says so (R3)", () => {
+    const result = applyRules(base, "A long answer.", TODAY, true);
+    expect(result.completeness).toBe("partial");
+    expect(result.ruleNotes.join(" ")).toMatch(/too long to read in full/);
   });
 
   it("drops a flag whose quote is not in the answer, and keeps one that is (ignoring case, spacing, curly quotes)", () => {
@@ -77,15 +159,5 @@ describe("applyRules", () => {
       TODAY,
     );
     expect(result.completeness).toBe("insufficient");
-  });
-
-  it("ignores an expiry date that isn't a real date", () => {
-    const result = applyRules(
-      { ...base, facts: { ...base.facts, expiryDate: "2026-02-31" } },
-      "Expires Feb 31.",
-      TODAY,
-    );
-    expect(result.facts.expiryDate).toBeNull();
-    expect(result.completeness).toBe("complete");
   });
 });

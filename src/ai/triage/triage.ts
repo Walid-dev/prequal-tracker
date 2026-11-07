@@ -93,7 +93,7 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
       ...(reasoning ? { reasoning } : {}),
     });
     const run = info(result.usage.inputTokens, result.usage.outputTokens);
-    // Check how the call ended before trusting the output: a refusal or a cut-off is not a result.
+    // Check how the call ended before trusting the output: only a normal stop is a result.
     const problem = finishProblem(result.finishReason, result.rawFinishReason);
     if (problem) return { ...run, ok: false, error: problem };
     const output = result.output;
@@ -101,7 +101,7 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
       ...run,
       ok: true,
       modelCompleteness: output.completeness,
-      result: applyRules(output, input.answer, input.today),
+      result: applyRules(output, input.answer, input.today, message.truncated),
     };
   } catch (error) {
     if (NoObjectGeneratedError.isInstance(error)) {
@@ -110,7 +110,9 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
         ...run,
         ok: false,
         error:
-          finishProblem(error.finishReason, undefined) ??
+          (error.finishReason
+            ? finishProblem(error.finishReason, undefined)
+            : undefined) ??
           "The model's answer didn't match the expected format. Review this answer by hand.",
       };
     }
@@ -118,7 +120,7 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
   }
 }
 
-/** Explains a finish that means "no usable result", or returns undefined when the call ended normally. */
+/** Explains why a finish is not a usable result. Only a normal stop is accepted: everything else fails closed. */
 function finishProblem(
   reason: FinishReason | undefined,
   raw: string | undefined,
@@ -129,6 +131,8 @@ function finishProblem(
     return "The model's answer was cut off at its length limit. Review this answer by hand.";
   if (reason === "content-filter")
     return "A content filter stopped the answer. Review this answer by hand.";
+  if (reason !== "stop")
+    return `The model stopped unexpectedly (${reason ?? "no reason given"}). Review this answer by hand.`;
   return undefined;
 }
 

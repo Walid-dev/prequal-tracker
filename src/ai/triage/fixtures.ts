@@ -6,7 +6,12 @@ import { MockLanguageModelV4 } from "ai/test";
 import { SAMPLE_ANSWERS } from "@/samples/answers";
 import type { ModelOutput } from "./schema";
 
-const NO_FACTS = { expiryDate: null, coverageAmount: null, holderName: null };
+const NO_FACTS = {
+  expiryDate: null,
+  expiryQuote: null,
+  coverageAmount: null,
+  holderName: null,
+};
 
 export const FIXTURES: Record<string, ModelOutput> = {
   "cgl-complete": {
@@ -15,6 +20,7 @@ export const FIXTURES: Record<string, ModelOutput> = {
       "Harbourview Mutual policy CGL-448210 covers Brightline Electric Ltd. for $5,000,000 per occurrence until 2027-08-31, with the general contractor as additional insured.",
     facts: {
       expiryDate: "2027-08-31",
+      expiryQuote: "Expiry date: 2027-08-31",
       coverageAmount: 5_000_000,
       holderName: "Brightline Electric Ltd.",
     },
@@ -27,6 +33,7 @@ export const FIXTURES: Record<string, ModelOutput> = {
       "Coverage is $1,000,000 per occurrence, below the $2,000,000 the request requires. The other details are present.",
     facts: {
       expiryDate: "2027-04-30",
+      expiryQuote: "expires 2027-04-30",
       coverageAmount: 1_000_000,
       holderName: "Tidewater Plumbing Inc.",
     },
@@ -52,6 +59,7 @@ export const FIXTURES: Record<string, ModelOutput> = {
       "WSIB clearance certificate C-1093382 for Brightline Electric Ltd., valid 2026-05-01 to 2026-10-31.",
     facts: {
       expiryDate: "2026-10-31",
+      expiryQuote: "Valid from 2026-05-01 to 2026-10-31",
       coverageAmount: null,
       holderName: "Brightline Electric Ltd.",
     },
@@ -91,6 +99,7 @@ export const FIXTURES: Record<string, ModelOutput> = {
       "The policy is issued to Tidewater Holdings Ltd., not Tidewater Plumbing Inc. Coverage, expiry, and additional insured are in order.",
     facts: {
       expiryDate: "2027-06-30",
+      expiryQuote: "expiry 2027-06-30",
       coverageAmount: 2_000_000,
       holderName: "Tidewater Holdings Ltd.",
     },
@@ -110,6 +119,7 @@ export const FIXTURES: Record<string, ModelOutput> = {
       "IHSA COR certificate COR-2026-55120 for Tidewater Plumbing Inc., valid until 2027-03-15.",
     facts: {
       expiryDate: "2027-03-15",
+      expiryQuote: "valid until 2027-03-15",
       coverageAmount: null,
       holderName: "Tidewater Plumbing Inc.",
     },

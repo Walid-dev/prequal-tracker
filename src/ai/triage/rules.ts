@@ -16,15 +16,11 @@ const RANK: Record<Completeness, number> = {
 const MAX_SUMMARY_CHARS = 600;
 const MAX_FLAGS = 8;
 const MAX_QUESTIONS = 5;
+const CONFIRM_EXPIRY = "Please confirm the expiry date of this document.";
 
 // Phrases that try to steer the review. Used to flag the answer for the reviewer, never to block it.
 const STEERING =
   /ignore (all |your |the )?(previous |prior |above )?instructions|note to the ai|as an ai|mark (this|it) (as )?(complete|accepted)|system (note|prompt|message)/i;
-
-/** Lowers completeness to `cap` if it is higher. Never raises it. */
-function capAt(current: Completeness, cap: Completeness): Completeness {
-  return RANK[current] > RANK[cap] ? cap : current;
-}
 
 /** Makes text comparable: lower case, straight quotes, single spaces. */
 function normalize(text: string): string {
@@ -37,8 +33,8 @@ function normalize(text: string): string {
 }
 
 /** Parses a YYYY-MM-DD string into a UTC date, or returns null when it isn't a real date. */
-function parseDay(value: string | null): Date | null {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+function parseDay(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isNaN(date.getTime()) ||
     date.toISOString().slice(0, 10) !== value
@@ -51,58 +47,68 @@ export function applyRules(
   output: ModelOutput,
   answer: string,
   today: string,
+  truncated = false,
 ): TriageResult {
   const notes: string[] = [];
-  let completeness = output.completeness;
+  const ruleFlags: TriageFlag[] = [];
+  const questions = [...output.followUpQuestions];
   const haystack = normalize(answer);
+  const inAnswer = (quote: string | null) =>
+    Boolean(quote?.trim()) && haystack.includes(normalize(quote ?? ""));
+  let completeness = output.completeness;
+  const lowerTo = (cap: Completeness, reason: string) => {
+    if (RANK[completeness] > RANK[cap]) {
+      notes.push(`Lowered to ${cap}: ${reason}`);
+      completeness = cap;
+    }
+  };
 
   // 1. Every flag must quote words that really appear in the answer.
-  const grounded = output.flags.filter(
-    (flag) => flag.quote.trim() && haystack.includes(normalize(flag.quote)),
-  );
+  const grounded = output.flags.filter((flag) => inAnswer(flag.quote));
   const dropped = output.flags.length - grounded.length;
-  if (dropped > 0)
+  if (dropped > 0) {
     notes.push(`Dropped ${dropped} flag(s) whose quote is not in the answer.`);
-  const flags: TriageFlag[] = [...grounded];
-  const hasFlag = (code: FlagCode) => flags.some((flag) => flag.code === code);
+  }
 
-  // 2. An expiry date before today means the document is expired, whatever the model said.
+  // 2. An expiry date counts only when it is a real date and its own words are in the answer.
   const facts = { ...output.facts };
-  const expiry = parseDay(facts.expiryDate);
-  if (facts.expiryDate && !expiry) {
-    notes.push(
-      `Ignored an expiry date that isn't a real YYYY-MM-DD date: "${facts.expiryDate}".`,
-    );
-    facts.expiryDate = null;
-  }
-  if (expiry && facts.expiryDate && facts.expiryDate < today) {
-    if (!hasFlag("expired")) {
-      flags.push({ code: "expired", quote: facts.expiryDate, byRule: true });
-    }
-    if (RANK[completeness] > RANK.partial) {
+  if (facts.expiryDate) {
+    const date = facts.expiryDate;
+    if (!parseDay(date)) {
+      notes.push(`Ignored an expiry date that isn't a real date: "${date}".`);
+      facts.expiryDate = null;
+      lowerTo("partial", "the expiry date can't be read as a real date.");
+      if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
+    } else if (!inAnswer(facts.expiryQuote)) {
       notes.push(
-        `Lowered to partial: the expiry date ${facts.expiryDate} is before today (${today}).`,
+        `Ignored the expiry date ${date}: the words behind it are not in the answer.`,
       );
+      facts.expiryDate = null;
+      lowerTo("partial", "the expiry date isn't backed by the answer.");
+      if (!questions.includes(CONFIRM_EXPIRY)) questions.push(CONFIRM_EXPIRY);
+    } else if (date < today) {
+      // The document has expired, whatever the model said.
+      const quote = facts.expiryQuote ?? date;
+      if (!grounded.some((flag) => flag.code === "expired")) {
+        ruleFlags.push({ code: "expired", quote, byRule: true });
+        notes.push(
+          `Flagged by rule: the expiry date ${date} is before today (${today}).`,
+        );
+      }
+      lowerTo("partial", `the expiry date ${date} is before today (${today}).`);
+      if (questions.length === 0) {
+        questions.push(
+          `This document ended on ${date}. Please send a current one.`,
+        );
+      }
     }
-    completeness = capAt(completeness, "partial");
-  }
-  const questions = [...output.followUpQuestions];
-  if (
-    expiry &&
-    facts.expiryDate &&
-    facts.expiryDate < today &&
-    questions.length === 0
-  ) {
-    questions.push(
-      `This document ended on ${facts.expiryDate}. Please send a current one.`,
-    );
   }
 
   // 3. Wording that tries to steer the review is flagged for the reviewer, and the answer can't be complete.
   const steering = answer.match(STEERING);
   if (steering) {
-    if (!hasFlag("suspicious_instructions")) {
-      flags.push({
+    if (!grounded.some((flag) => flag.code === "suspicious_instructions")) {
+      ruleFlags.push({
         code: "suspicious_instructions",
         quote: steering[0],
         byRule: true,
@@ -111,18 +117,25 @@ export function applyRules(
         "Flagged by rule: the answer contains wording aimed at the review.",
       );
     }
-    if (RANK[completeness] > RANK.partial) {
-      notes.push(
-        "Lowered to partial: an answer that tries to steer the review can't be complete.",
-      );
-    }
-    completeness = capAt(completeness, "partial");
+    lowerTo(
+      "partial",
+      "an answer that tries to steer the review can't be complete.",
+    );
   }
 
-  // 4. Keep the note short enough to read.
-  const unique = flags.filter(
+  // 4. An answer the model only read in part can't be complete.
+  if (truncated) {
+    notes.push(
+      "The answer was too long to read in full. Review the rest by hand.",
+    );
+    lowerTo("partial", "the model read only part of the answer.");
+  }
+
+  // 5. Keep the note short enough to read. Rule flags go first, so the cap never removes them.
+  const all = [...ruleFlags, ...grounded];
+  const unique = all.filter(
     (flag, index) =>
-      flags.findIndex(
+      all.findIndex(
         (other) => other.code === flag.code && other.quote === flag.quote,
       ) === index,
   );
