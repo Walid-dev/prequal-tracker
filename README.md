@@ -102,7 +102,7 @@ Each case ran twice per model, on prompt `triage-v1`. No model rated an answer m
 
 ```bash
 npm run eval        # mock mode: free, runs in CI, fails if the pipeline or the rules break
-npm run eval:live -- --models=claude-sonnet-5 --runs=2 --out=docs/eval/report.md   # paid
+npm run eval:live -- --models=anthropic:claude-sonnet-5 --runs=2 --out=docs/eval/report.md   # paid
 ```
 
 Eight cases make a regression check, not proof of robustness. They show the pipeline handles known cases. A production rollout would grow the set from real answers.
