@@ -53,6 +53,7 @@ Drizzle:
 - Give every exported function a one-line comment in plain words.
 - Write comments about purpose. Do not restate each line.
 - Use named exports, kebab-case file names, and strict TypeScript. Do not use `any`.
+- Exception: Next.js pages, layouts, and config files use default exports, because the framework requires them.
 
 ## Commands
 
@@ -71,6 +72,11 @@ Drizzle:
 - Other projects on the same machine may use Docker too.
 - Run only `docker compose` commands in this folder.
 - Never prune, reset, or remove anything that is not named `prequal-tracker`.
+
+## Processes
+
+- Other projects on this machine run Node servers too. Never stop processes by name (no `pkill`, no `killall`).
+- Check a running app through tests that call the code directly, or through this project's `docker compose` stack.
 
 ## Secrets
 
