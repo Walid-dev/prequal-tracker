@@ -1,0 +1,9 @@
+# Keep secrets, local data, and build leftovers out of the image.
+.env*
+data
+node_modules
+.next
+.git
+coverage
+docs
+*.md
