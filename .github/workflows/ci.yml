@@ -1,0 +1,29 @@
+# Runs on every push and pull request: lint, typecheck, tests, the mock eval, the migration check, and a build.
+# No secrets and no paid calls: AI_MODE defaults to mock.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run eval
+      - run: npm run db:check
+      - run: npm run build
