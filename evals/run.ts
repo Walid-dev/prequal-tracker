@@ -1,8 +1,9 @@
 // Runs the eval: every case through the real triage module, scored against the expected answers.
-// Mock mode (default) needs no key and runs in CI. Live mode calls Claude and costs money:
+// Mock mode (default) needs no key and runs in CI. Live mode calls the model and costs money:
 //   npm run eval
-//   npm run eval:live -- --models=claude-haiku-4-5,claude-sonnet-5,claude-opus-5 --runs=2 --out=docs/eval/report.md
+//   npm run eval:live -- --models=anthropic:claude-sonnet-5,openai:gpt-6-sol --runs=2 --out=docs/eval/report.md
 import { writeFileSync } from "node:fs";
+import { DEFAULT_MODEL } from "@/ai/triage/model";
 import { PROMPT_VERSION } from "@/ai/triage/prompt";
 import { runTriage } from "@/ai/triage/triage";
 import { checklistFor, TRADE_LABELS } from "@/domain/checklists";
@@ -29,7 +30,7 @@ function flag(name: string, fallback: string): string {
 async function main() {
   const live = process.argv.includes("--live");
   const models = live
-    ? flag("models", "claude-haiku-4-5").split(",")
+    ? flag("models", DEFAULT_MODEL).split(",")
     : ["mock-fixtures"];
   const runs = Number(flag("runs", live ? "2" : "1"));
   const out = flag("out", "");

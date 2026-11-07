@@ -56,11 +56,6 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
   const instructions = buildInstructions(input, input.today);
   const message = buildAnswerMessage(input.answer);
   const modelName = input.mode === "mock" ? "mock-fixtures" : input.modelId;
-  const model =
-    input.model ??
-    (input.mode === "mock"
-      ? mockModelFor(input.answer)
-      : liveModel(input.modelId));
   const reasoning =
     input.mode === "live" ? reasoningFor(input.modelId) : undefined;
   const started = Date.now();
@@ -83,6 +78,12 @@ export async function runTriage(input: TriageInput): Promise<TriageOutcome> {
   });
 
   try {
+    // Inside the try, so a mistyped AI_MODEL becomes a failed run with a clear reason.
+    const model =
+      input.model ??
+      (input.mode === "mock"
+        ? mockModelFor(input.answer)
+        : liveModel(input.modelId));
     const result = await generateText({
       model,
       instructions,

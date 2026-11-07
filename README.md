@@ -25,13 +25,13 @@ npm run seed      # adds the two demo subcontractors
 npm run dev
 ```
 
-**Live AI:** set `AI_MODE=live` and `ANTHROPIC_API_KEY` in `.env.local`. With Docker, run `docker compose up -d` again to pick up the change.
+**Live AI:** set `AI_MODE=live` and the key for your provider in `.env.local`. With Docker, run `docker compose up -d` again to pick up the change.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
 | `AI_MODE` | `mock` | `mock` uses stored answers, with no key and no cost. `live` calls the model. |
-| `ANTHROPIC_API_KEY` | none | Required for live mode. Read at run time, never built into the image. |
-| `AI_MODEL` | `claude-sonnet-5` | Chosen from the eval. `claude-haiku-4-5` is a cheaper option. |
+| `AI_MODEL` | `anthropic:claude-sonnet-5` | The model, as `provider:model`. This one setting switches the model and the provider, for example `anthropic:claude-haiku-4-5` or `openai:gpt-6-sol`. |
+| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | none | The key for the provider in `AI_MODEL`. Read at run time, never built into the image. |
 | `DATABASE_PATH` | `./data/app.db` | The SQLite file. Docker uses `/data/app.db` on a named volume. |
 | `SEED_DEMO_DATA` | `false` (Docker: `true`) | Adds the demo cases at start when the database is empty. |
 
@@ -73,7 +73,7 @@ flowchart LR
 
 ## The AI feature
 
-One triage is one structured call to the model through the Vercel AI SDK. The default is Claude Sonnet 5.
+One triage is one structured call to the model through the Vercel AI SDK. The default is Claude Sonnet 5. Any other model or provider is one setting, `AI_MODEL=provider:model`. Anthropic and OpenAI are registered, and adding another provider is one package and one line in `src/ai/triage/model.ts`.
 
 1. Code builds the context. Our rules and the request go in the system instructions. The subcontractor's answer goes alone in the user message, inside `<answer>` tags, and is treated as data.
 2. The model returns JSON checked against a Zod schema: completeness, summary, extracted facts, flags from a closed list (each with a quote), and follow-up questions.

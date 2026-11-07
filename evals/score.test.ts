@@ -17,7 +17,7 @@ const info = {
   input: "",
   inputTruncated: false,
   mode: "live" as const,
-  model: "claude-haiku-4-5",
+  model: "anthropic:claude-haiku-4-5",
   promptVersion: "triage-v1",
   latencyMs: 4000,
   inputTokens: 1200,

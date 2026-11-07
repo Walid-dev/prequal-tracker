@@ -2,6 +2,7 @@
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
 import { sampleAnswer } from "@/samples/answers";
+import { liveModel } from "./model";
 import { runTriage, type TriageInput } from "./triage";
 
 const USAGE = {
@@ -44,7 +45,7 @@ function inputFor(
     answer: sample.body,
     today: "2026-11-07",
     mode: "mock",
-    modelId: "claude-opus-5",
+    modelId: "anthropic:claude-opus-5",
     ...extra,
   };
 }
@@ -173,5 +174,24 @@ describe("runTriage", () => {
     );
     expect(outcome.inputTruncated).toBe(true);
     expect(outcome.ok && outcome.result.completeness).toBe("partial");
+  });
+
+  it("turns a mistyped AI_MODEL into a failed run with a clear reason", async () => {
+    const outcome = await runTriage(
+      inputFor("cgl-complete", { mode: "live", modelId: "claude-sonnet-5" }),
+    );
+    expect(outcome.ok).toBe(false);
+    expect(!outcome.ok && outcome.error).toMatch(/provider:model/);
+  });
+});
+
+describe("liveModel", () => {
+  it("resolves any registered provider from one provider:model setting", () => {
+    expect(liveModel("openai:gpt-6-sol")).toMatchObject({
+      modelId: "gpt-6-sol",
+    });
+    expect(liveModel("anthropic:claude-sonnet-5")).toMatchObject({
+      modelId: "claude-sonnet-5",
+    });
   });
 });
