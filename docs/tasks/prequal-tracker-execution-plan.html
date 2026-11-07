@@ -283,11 +283,11 @@
       <p class="eyebrow">Execution plan · take-home build · written 2026-11-07, updated 2026-11-07</p>
       <h1>Prequal Tracker <span class="scribble">build</span></h1>
       <p class="lede">The runbook for building the subcontractor prequalification tracker: 12 commits in 4 gates, then an independent review by a second AI model. Each commit has its files, its check, and its message. You read each gate, say GO, and I commit. The spec lives in <code>docs/PLAN.md</code>, the design in <code>docs/tasks/prequal-tracker-design.html</code>, and the decisions in <code>docs/decisions.md</code>.</p>
-      <p class="small muted">Status: pushed to GitHub. Gate 5 is open on <code>fix/review</code>: the review brief is ready for the second model.</p>
+      <p class="small muted">Status: all five gates done. The second model's review found seven issues, and all seven are fixed on <code>fix/review</code>, ready to merge through a pull request.</p>
       <ul class="chips">
-        <li class="chip">Now: <b>step 13</b></li>
+        <li class="chip">Now: <b>merge the PR</b></li>
         <li class="chip">Commits: <b>12 of 12</b></li>
-        <li class="chip">Gates: <b>4 of 5</b></li>
+        <li class="chip">Gates: <b>5 of 5</b></li>
         <li class="chip">Budget: <b>3 h</b>, hard stop 3.5 h</li>
         <li class="chip">Build time: <b>about 1 h 45</b></li>
       </ul>
@@ -426,7 +426,7 @@
             <text x="814" y="196" class="t-sub">Codex · after gate 4</text>
             <a href="#step-13" aria-label="Step 13 Codex review">
               <rect x="808" y="208" width="160" height="19" rx="5" class="hit"/>
-              <circle cx="821" cy="217.5" r="4.5" class="dot-ready"/>
+              <circle cx="821" cy="217.5" r="4.5" class="dot-done"/>
               <text x="832" y="222" class="t-link">Step 13<tspan class="t-cname"> Codex review</tspan></text>
             </a>
           </svg>
@@ -593,7 +593,7 @@
           <div>
             <div class="t">The triage module</div>
             <div class="who">I</div>
-            <p>The AI feature as one self-contained folder. It builds the context, makes one model call through the AI SDK with a Zod schema, applies the rules (expired dates, quotes that must exist, an 8,000-character cap, can only lower), and reports tokens, cost, and time. It knows nothing about the database. Mock mode uses stored fixture answers, some with deliberate mistakes so the rules get exercised. A thin service saves each run and never touches request status.</p>
+            <p>The AI feature as one self-contained folder. It builds the context, makes one model call through the AI SDK with a Zod schema, applies the rules (expired dates, quotes that must exist, a cap at the form's 20,000-character limit, can only lower), and reports tokens, cost, and time. It knows nothing about the database. Mock mode uses stored fixture answers, some with deliberate mistakes so the rules get exercised. A thin service saves each run and never touches request status.</p>
             <p class="files">Files: src/ai/triage/schema.ts · prompt.ts · rules.ts · model.ts · fixtures.ts · triage.ts · rules.test.ts · triage.test.ts · src/domain/triage.ts · src/domain/triage.test.ts</p>
             <p class="chk">Check: tests prove that an expired date lowers the result to partial with an EXPIRED flag, a quote not in the answer is dropped, the rules never raise, schema failures and timeouts save a failed run, and triage leaves the request status unchanged. One live call with your key returns a valid result for under $0.02.</p>
             <p class="commit">feat(triage): add response triage module with structured output and rules</p>
@@ -683,7 +683,7 @@
         </li>
 
         <li class="phase" id="gate-5">Gate 5 · Independent review · after gate 4 · logged separately</li>
-        <li id="step-13" class="now">
+        <li id="step-13" class="done">
           <span class="num">13</span>
           <div>
             <div class="t">Review by a second model</div>
@@ -692,6 +692,7 @@
             <p class="files">Files: docs/review/brief.md · docs/review/findings.md · one fix commit per accepted finding</p>
             <p class="chk">Check: every finding is either fixed in a commit that names it or answered in <code>findings.md</code>, and lint, typecheck, tests, and the mock eval still pass after the fixes.</p>
             <p class="commit">docs(review): add the review brief and findings, then fix(...) per finding</p>
+            <p class="chk"><strong>☑ Done.</strong> Seven findings (1 high, 5 medium, 1 low), all reproduced and fixed, each with a test. The high one: a decision could land on an answer the reviewer never saw, and it is now refused. Also from this gate: one setting, <code>AI_MODEL=provider:model</code>, now picks the model and the provider. 46 tests and the mock eval pass.</p>
           </div>
         </li>
         <li class="gate">
@@ -699,7 +700,7 @@
           <div>
             <div class="t">GO 5: you read the findings and the fixes</div>
             <div class="who">you</div>
-            <p>On GO, I merge <code>fix/review</code> into <code>main</code>. The repo is then ready for you to push.</p>
+            <p>The pull request from <code>fix/review</code> into <code>main</code> carries the review, the fixes, and the design page. CI runs on it.</p>
           </div>
         </li>
       </ol>
@@ -733,13 +734,14 @@
         <li><span class="when">Design</span><span>Rewrote the plan around the request, response, and review pattern. Weighed three outside reviews and fact-checked the construction domain (WSIB, COR, ESA). A scope critique cut the plan by about 40%. Decisions locked in kickoff v3.</span></li>
         <li><span class="when">Step 0</span><span>Pre-flight checks green: Node, npm, and Docker ready, and git initialized.</span></li>
         <li><span class="when">Gate 1</span><span>Plan, decision log, agent rules, and this page committed on <code>main</code>.</span></li>
+        <li><span class="when">Review</span><span>Codex (GPT Sol 6.1) reviewed the whole repo against the brief. All seven findings were fixed on <code>fix/review</code>, each with a test, and one setting now picks the model and the provider.</span></li>
         <li><span class="when">Shared</span><span>Pushed to a private GitHub repository. Added the design page, <code>docs/tasks/prequal-tracker-design.html</code>, in the same format as this page, and the review brief, <code>docs/review/brief.md</code>.</span></li>
         <li><span class="when">Gate 4</span><span>Eval (8 of 8 in mock mode, three models live), CI, README, and process notes committed and merged into <code>main</code>.</span></li>
         <li><span class="when">Gate 3</span><span>AI module committed and merged into <code>main</code>: the triage module with its research-backed guards, and the triage panel. 34 tests and 10 browser checks pass.</span></li>
         <li><span class="when">Research</span><span>A verified multi-agent research pass on AI triage confirmed the one-call design and changed five details before gate 3.</span></li>
         <li><span class="when">Gate 2</span><span>Core app committed and merged into <code>main</code>: app setup, database, Docker, cases, responses, and reviews. 17 tests and 9 browser checks pass.</span></li>
       </ol>
-      <p>Next action: run the review with Codex, using <code>docs/review/brief.md</code>. I fix each finding you accept on <code>fix/review</code>.</p>
+      <p>Next action: merge the pull request from <code>fix/review</code> into <code>main</code> once CI is green.</p>
     </section>
   </main>
 </div>

@@ -4,10 +4,16 @@ One entry per decision: the date it was locked, the decision, why, and what we r
 
 ## Decided
 
+- **2026-11-07 · One setting picks the model and the provider: `AI_MODEL=provider:model`.**
+  Why: the design doesn't depend on one vendor. The AI SDK provider registry resolves ids like `anthropic:claude-sonnet-5` or `openai:gpt-6-sol`, and each provider reads its own key. Adding a provider is one package and one line.
+
+- **2026-11-07 · All seven findings from the second model's review are fixed.**
+  Why: each one was reproduced and was real. The fixes tightened the rules (prompt `triage-v2`) and added a check against reviewing a stale answer. See `docs/review/findings.md`.
+
 - **2026-11-07 · The design and the execution plan are HTML pages, in the same format as our kickoff docs.**
   Why: diagrams whose boxes open the code, links pinned to a commit, and hover cards explain the system faster than prose. Markdown stays for the README, decisions, and process notes, which GitHub renders.
 
-- **2026-11-07 · Default model: Claude Sonnet 5.**
+- **2026-11-07 · Default model: Claude Sonnet 5 (`anthropic:claude-sonnet-5`).**
   Why: in the eval (`docs/eval/2026-11-07-report.md`), Sonnet 5 and Haiku 4.5 both passed all 16 runs, and 8 cases can't separate them. Sonnet 5 is the stronger model for messier real answers, at about $0.006 per triage and 3.1 s.
   Rejected: Opus 5 (14 of 16, stricter than the request on one case, about $0.017 per triage and 5.5 s). Haiku 4.5 stays a cheaper option through `AI_MODEL`.
 

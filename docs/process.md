@@ -14,7 +14,7 @@ The work can pause between gates and resume later, so this log records active ti
 | Build, gate 2: core app | about 30 min |
 | Build, gate 3: AI module | about 15 min |
 | Build, gate 4: proof and docs | about 40 min |
-| Independent review | |
+| Independent review (second model, then fixes) | about 45 min |
 
 ## How it was planned
 
@@ -46,6 +46,7 @@ Every plan, claim, and change the AI produced was checked before it was kept. A 
 - **Library versions were checked, not assumed.** A first draft from another AI model used AI SDK 4 calls (`maxSteps`, `toDataStreamResponse()`) that no longer exist in version 7. Reading the published type files caught it before any code was written. `CLAUDE.md` now lists the current calls.
 - **Package tags were checked.** `npm install prisma` resolves to an 8.0 release candidate where SQLite is experimental. That finding led to Drizzle.
 - **Outside claims were source-checked.** Two claims from AI reviews, a company founding year and a "standard" insurance limit, had no source behind them and were left out.
+- **A second model reviewed the whole repo.** Codex (GPT Sol 6.1) worked from a written brief and reproduced each finding before reporting it. All seven findings were fixed, each with a test that fails without the fix.
 - **The model was chosen by measurement.** The eval ran 8 labelled cases twice on three models, with the labels committed first. Sonnet 5 and Haiku 4.5 passed every case. Opus 5 was stricter than the request on one case. Sonnet 5 became the default.
 - **Browser checks backed up the unit tests.** A real browser drove every form. It caught a dropdown that lost its value after a validation error, which was fixed in the same step.
 

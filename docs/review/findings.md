@@ -172,3 +172,19 @@ Checks ran with `AI_MODE=mock`; builds additionally used `DATABASE_PATH=:memory:
 - **Docker and CI:** No additional findings from static review of the default configuration. Docker execution and a successful production build remain unverified for the reasons recorded under Checks.
 
 External work trackers and the skill's unrelated multi-repository map were not applicable to this repository-wide local brief. Only this findings file was added; pre-existing working-tree changes were preserved.
+
+## Resolution
+
+All seven findings were reproduced and fixed on the `fix/review` branch. Each fix comes with a test that fails without it.
+
+| ID | Fix | Commit | Test |
+| --- | --- | --- | --- |
+| R1 | The review form sends the answer it showed. The service refuses the decision if a newer answer arrived. | `508d380` | `src/domain/requests.test.ts`: "refuses a decision on an answer that is no longer the latest" |
+| R2 | Only a normal stop counts as a result. Any other finish becomes a failed run. | `a7872a7` | `src/ai/triage/triage.test.ts`: "fails closed when the call ends with an error or an unknown reason" |
+| R3 | Answers are sent up to the form's 20,000-character limit. A cut answer is capped at partial. | `a7872a7` | `src/ai/triage/triage.test.ts`: "caps an answer too long to send in full at partial" |
+| R4 | The model returns the exact words behind the expiry date (prompt `triage-v2`). A date counts only when those words are in the answer. | `a7872a7` | `src/ai/triage/rules.test.ts`: "ignores an expiry date whose words are not in the answer" |
+| R5 | An invalid or unsupported expiry date caps the result at partial and asks for a real date. | `a7872a7` | `src/ai/triage/rules.test.ts`: "caps an answer at partial when the expiry date isn't a real date" |
+| R6 | Rule flags come before model flags, so the flag cap never removes them. | `a7872a7` | `src/ai/triage/rules.test.ts`: "keeps rule flags when the model already returned the maximum number of flags" |
+| R7 | The seed command loads `.env.local` when it exists. | `360d628` | Checked by running the command with and without the file. |
+
+After the fixes: lint, typecheck, 46 tests, and the mock eval (8 of 8) pass.

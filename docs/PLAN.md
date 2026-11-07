@@ -37,21 +37,24 @@ Status: all met. Tests, the mock eval, and the Docker checks cover them. Criteri
 3. A response moves a request from `Open` or `Changes requested` to `Responded`.
 4. A reviewer can accept a request only when it is `Responded`. The service refuses every other state.
 5. A reviewer can request changes on a `Responded` request. A note is required.
-6. Each review records the reviewer name, the note, the response, and the triage run the reviewer saw.
+6. Each review records the reviewer name, the note, the response, and the triage run the reviewer saw. A decision is refused if a newer answer arrived after the reviewer opened the page.
 7. The case page shows progress (accepted out of total) and lists requests that wait on changes as blockers.
 8. The request page shows a timeline of responses, triage runs, and reviews.
 9. AI triage returns completeness (`complete`, `partial`, or `insufficient`), a summary, extracted facts, flags with quotes, and follow-up questions.
-10. The triage output is validated against a schema. A run that fails validation, times out, or errors is saved as failed, with the error.
+10. The triage output is validated against a schema. Only a normal finish counts as a result. A run that fails validation, times out, errors, or ends any other way is saved as failed, with the reason.
 11. Rules run after the model:
-    - An expiry date before today sets completeness to `partial` at most and adds an `EXPIRED` flag.
+    - An expiry date counts only when the words stating it are in the answer. An expiry date that is invalid or unsupported caps completeness at `partial`.
+    - An expiry date before today sets completeness to `partial` at most and adds an `expired` flag.
     - A flag whose quote is not in the response is dropped and counted.
-    - The response is capped at 8,000 characters, and the run records the cut.
+    - Answers are sent in full, up to the form's 20,000-character limit. An answer that had to be cut is capped at `partial`.
+    - Flags added by rules are never removed by the flag cap.
 12. Rules never raise completeness.
 13. Triage never changes a request's status.
 14. Each run stores the model, the prompt version, tokens, cost, latency, and the exact input.
 15. The app runs with `AI_MODE=mock` and no API key.
 16. `docker compose up` starts the app with its data on a named volume. The data survives a restart.
 17. CI runs lint, typecheck, tests, the mock eval, and the build on every push.
+18. One setting, `AI_MODEL=provider:model`, picks the model and the provider.
 
 ## Out of scope
 

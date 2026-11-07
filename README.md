@@ -98,7 +98,7 @@ Eight labelled cases cover a complete answer, low coverage, an expired clearance
 | **Claude Sonnet 5 (default)** | 16 of 16 | 3.1 s | about $0.006 |
 | Claude Opus 5 | 14 of 16 | 5.5 s | about $0.017 |
 
-Each case ran twice per model. No model rated an answer more leniently than its label. Opus 5 was stricter than the request on one case. Full report: [docs/eval/2026-11-07-report.md](docs/eval/2026-11-07-report.md).
+Each case ran twice per model, on prompt `triage-v1`. No model rated an answer more leniently than its label. Opus 5 was stricter than the request on one case. Full report: [docs/eval/2026-11-07-report.md](docs/eval/2026-11-07-report.md).
 
 ```bash
 npm run eval        # mock mode: free, runs in CI, fails if the pipeline or the rules break
@@ -109,7 +109,7 @@ Eight cases make a regression check, not proof of robustness. They show the pipe
 
 ## Tests and CI
 
-- `npm test`: 38 tests for the business rules, the AI rules, every failure path of the triage call (mock models), the triage service, and the eval scoring. A service-level flow test runs case → answer → accept → progress on a real SQLite database.
+- `npm test`: 46 tests for the business rules, the AI rules, every failure path of the triage call (mock models), the triage service, and the eval scoring. A service-level flow test runs case → answer → accept → progress on a real SQLite database.
 - `npm run lint` (Biome) and `npm run typecheck`.
 - GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, typecheck, tests, the mock eval, the migration check, and the build on every push. There are no secrets and no paid calls.
 
@@ -149,7 +149,7 @@ The same loop works on an old codebase, in a safer order:
 
 ## How it was built
 
-Built with Claude Code, in four gates, each reviewed before it was committed. A second AI model (Codex, GPT Sol 6.1) reviews the finished repo against [docs/review/brief.md](docs/review/brief.md).
+Built with Claude Code, in four gates, each reviewed before it was committed. A second AI model (Codex, GPT Sol 6.1) then reviewed the whole repo against [docs/review/brief.md](docs/review/brief.md). All seven of its findings were fixed, each with a test: see [docs/review/findings.md](docs/review/findings.md).
 
 The two HTML pages open in any browser. GitHub shows their source, so download them or open them from a clone.
 
